@@ -230,8 +230,8 @@ export default function MonitoringPage() {
    * Handle connecting a new service
    */
   const handleConnectService = () => {
-    // In production, this would open a service connection wizard
-    console.log("Opening service connection wizard...")
+    // Navigate to the service connection page
+    router.push("/monitoring/connect")
   }
 
   /**
