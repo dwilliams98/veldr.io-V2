@@ -146,7 +146,9 @@ export default function ElderDetailPage() {
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center space-x-3">
                         <Badge variant={getRiskBadgeColor(log.riskLevel)}>{log.riskLevel}</Badge>
-                        <span className="text-sm text-gray-500">{new Date(log.timestamp).toLocaleString()}</span>
+                        <span className="text-xs text-gray-500" suppressHydrationWarning>
+                          {new Date(log.timestamp).toLocaleString()}
+                        </span>
                         <span className="text-sm text-gray-500">Duration: {log.duration}</span>
                       </div>
                       {log.riskLevel === "Critical" && <AlertTriangle className="h-5 w-5 text-red-500" />}

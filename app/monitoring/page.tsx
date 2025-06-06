@@ -24,7 +24,6 @@ import {
 } from "lucide-react"
 import Navbar from "@/components/navbar"
 
-// Type definitions for monitoring services
 interface MonitoringService {
   id: string
   name: string
@@ -47,7 +46,6 @@ interface ServiceAlert {
   resolved: boolean
 }
 
-// Mock data with proper typing
 const mockMonitoringServices: MonitoringService[] = [
   {
     id: "phone",
@@ -153,7 +151,6 @@ export default function MonitoringPage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Check authentication
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("veldr_token")
       if (!token) {
@@ -162,15 +159,10 @@ export default function MonitoringPage() {
       }
     }
 
-    // Simulate loading
     const timer = setTimeout(() => setIsLoading(false), 500)
     return () => clearTimeout(timer)
   }, [router])
 
-  /**
-   * Toggle service status between active and inactive
-   * @param serviceId - The ID of the service to toggle
-   */
   const toggleService = (serviceId: string) => {
     setServices((prevServices) =>
       prevServices.map((service) =>
@@ -185,20 +177,10 @@ export default function MonitoringPage() {
     )
   }
 
-  /**
-   * Get color class for service status
-   * @param status - The status of the service
-   * @returns CSS color class
-   */
   const getStatusColor = (status: string): string => {
     return status === "active" ? "text-green-600" : "text-gray-400"
   }
 
-  /**
-   * Get badge variant for alert risk level
-   * @param type - The type/risk level of the alert
-   * @returns Badge variant
-   */
   const getRiskBadgeColor = (type: string) => {
     switch (type) {
       case "Critical":
@@ -212,11 +194,6 @@ export default function MonitoringPage() {
     }
   }
 
-  /**
-   * Format timestamp for display
-   * @param timestamp - ISO timestamp string
-   * @returns Formatted date string
-   */
   const formatTimestamp = (timestamp: string): string => {
     try {
       return new Date(timestamp).toLocaleString()
@@ -226,29 +203,15 @@ export default function MonitoringPage() {
     }
   }
 
-  /**
-   * Handle connecting a new service
-   */
   const handleConnectService = () => {
-    // Navigate to the service connection page
     router.push("/monitoring/connect")
   }
 
-  /**
-   * Handle marking an alert as resolved
-   * @param alertId - The ID of the alert to resolve
-   */
   const handleResolveAlert = (alertId: string) => {
-    // In production, this would call an API to update the alert status
     console.log(`Resolving alert ${alertId}`)
   }
 
-  /**
-   * Handle escalating an alert
-   * @param alertId - The ID of the alert to escalate
-   */
   const handleEscalateAlert = (alertId: string) => {
-    // In production, this would trigger escalation workflow
     console.log(`Escalating alert ${alertId}`)
   }
 
@@ -387,7 +350,9 @@ export default function MonitoringPage() {
                         </div>
                         <div className="flex items-center space-x-2">
                           {alert.resolved && <CheckCircle className="h-4 w-4 text-green-600" />}
-                          <span className="text-xs text-gray-500">{formatTimestamp(alert.timestamp)}</span>
+                          <span className="text-xs text-gray-500" suppressHydrationWarning>
+                            {formatTimestamp(alert.timestamp)}
+                          </span>
                         </div>
                       </div>
                       <p className="text-gray-700 mb-3">{alert.message}</p>

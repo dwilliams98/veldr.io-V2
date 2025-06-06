@@ -320,7 +320,9 @@ export default function Dashboard() {
                       </div>
                       <Badge variant={getRiskBadgeColor(alert.riskLevel)}>{alert.riskLevel}</Badge>
                     </div>
-                    <span className="text-xs text-gray-500">{formatTimestamp(alert.timestamp)}</span>
+                    <span className="text-xs text-gray-500" suppressHydrationWarning>
+                      {formatTimestamp(alert.timestamp)}
+                    </span>
                   </div>
                   <p className="text-sm text-gray-600 mb-3">{alert.transcript}</p>
                   <div className="flex flex-wrap gap-2">
