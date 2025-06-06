@@ -165,24 +165,31 @@ export default function AlertsPage() {
   const [filterStatus, setFilterStatus] = useState<"all" | "unresolved" | "resolved">("all")
   const [activeTab, setActiveTab] = useState("all")
   const [isLoading, setIsLoading] = useState(true)
+  const [isClient, setIsClient] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isClient) return
+
     // Check authentication
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("veldr_token")
-      if (!token) {
-        router.push("/login")
-        return
-      }
+    const token = localStorage.getItem("veldr_token")
+    if (!token) {
+      router.push("/login")
+      return
     }
 
     // Simulate loading
     const timer = setTimeout(() => setIsLoading(false), 500)
     return () => clearTimeout(timer)
-  }, [router])
+  }, [router, isClient])
 
   useEffect(() => {
+    if (!isClient) return
+
     // Apply filters and search
     let filtered = alerts
 
@@ -231,13 +238,8 @@ export default function AlertsPage() {
     filtered.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
 
     setFilteredAlerts(filtered)
-  }, [alerts, searchTerm, filterChannel, filterRisk, filterStatus, activeTab])
+  }, [alerts, searchTerm, filterChannel, filterRisk, filterStatus, activeTab, isClient])
 
-  /**
-   * Get badge color for risk level
-   * @param riskLevel - The risk level of the alert
-   * @returns Badge variant
-   */
   const getRiskBadgeColor = (riskLevel: string) => {
     switch (riskLevel) {
       case "Critical":
@@ -251,11 +253,6 @@ export default function AlertsPage() {
     }
   }
 
-  /**
-   * Get channel icon component
-   * @param channel - The channel type
-   * @returns Icon component
-   */
   const getChannelIcon = (channel: string) => {
     switch (channel) {
       case "Phone":
@@ -273,12 +270,9 @@ export default function AlertsPage() {
     }
   }
 
-  /**
-   * Format timestamp for display
-   * @param timestamp - ISO timestamp string
-   * @returns Formatted date string
-   */
   const formatTimestamp = (timestamp: string): string => {
+    if (!isClient) return ""
+    
     try {
       const date = new Date(timestamp)
       const now = new Date()
@@ -298,28 +292,20 @@ export default function AlertsPage() {
     }
   }
 
-  /**
-   * Handle marking an alert as resolved
-   * @param alertId - The ID of the alert to resolve
-   */
   const handleResolveAlert = (alertId: string) => {
     setAlerts((prev) => prev.map((alert) => (alert.id === alertId ? { ...alert, resolved: true } : alert)))
   }
 
-  /**
-   * Handle escalating an alert
-   * @param alertId - The ID of the alert to escalate
-   */
   const handleEscalateAlert = (alertId: string) => {
     setAlerts((prev) => prev.map((alert) => (alert.id === alertId ? { ...alert, escalated: true } : alert)))
   }
 
-  /**
-   * Handle archiving an alert
-   * @param alertId - The ID of the alert to archive
-   */
   const handleArchiveAlert = (alertId: string) => {
     setAlerts((prev) => prev.filter((alert) => alert.id !== alertId))
+  }
+
+  if (!isClient) {
+    return null
   }
 
   if (isLoading) {
