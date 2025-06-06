@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Shield, Phone, Users, AlertTriangle, CheckCircle, Star, ArrowRight, Play } from "lucide-react"
+import { APP_VERSION } from "@/config/version"
 
 export default function LandingPage() {
   return (
@@ -260,7 +261,10 @@ export default function LandingPage() {
           </div>
 
           <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; 2024 Veldr.io. Protecting families through transparent AI.</p>
+            <p>
+              &copy; 2024 Veldr.io. Protecting families through transparent AI.{" "}
+              <span className="text-primary">v{APP_VERSION}</span>
+            </p>
           </div>
         </div>
       </footer>

@@ -41,6 +41,7 @@ import {
 import Link from "next/link"
 import Navbar from "@/components/navbar"
 import { useApp } from "@/contexts/app-context"
+import { VersionInfo } from "@/components/version-info"
 
 // Service interfaces for type safety
 interface MonitoringService {
@@ -179,9 +180,12 @@ export default function Dashboard() {
       <main className="container mx-auto px-4 py-8">
         {/* Header with Welcome Message */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Welcome back, {user?.name || "User"}</h1>
-            <p className="text-muted-foreground">Here's what's happening with your family's protection</p>
+          <div className="flex items-center gap-2">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Welcome back, {user?.name || "User"}</h1>
+              <p className="text-muted-foreground">Here's what's happening with your family's protection</p>
+            </div>
+            <VersionInfo />
           </div>
           <div className="flex gap-3">
             <Button variant="outline" onClick={handleRefresh} disabled={isRefreshing}>

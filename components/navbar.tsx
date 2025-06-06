@@ -17,6 +17,7 @@ import {
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Shield, Settings, LogOut, User, Menu, Bell, HelpCircle, AlertTriangle, CheckCircle } from "lucide-react"
 import { useApp } from "@/contexts/app-context"
+import { APP_VERSION } from "@/config/version"
 
 export default function Navbar() {
   const { user, notifications, markNotificationAsRead, markAllNotificationsAsRead, setUser } = useApp()
@@ -276,6 +277,9 @@ export default function Navbar() {
                     <SheetTitle className="flex items-center space-x-2">
                       <Shield className="h-6 w-6 text-primary" />
                       <span>Veldr.io</span>
+                      <Badge variant="outline" className="ml-2 text-xs">
+                        v{APP_VERSION}
+                      </Badge>
                     </SheetTitle>
                     <SheetDescription>Navigate your family protection dashboard</SheetDescription>
                   </SheetHeader>

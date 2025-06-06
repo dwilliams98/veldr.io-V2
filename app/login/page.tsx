@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Shield, Eye, EyeOff } from "lucide-react"
+import { APP_VERSION } from "@/config/version"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -95,6 +96,7 @@ export default function LoginPage() {
             <Link href="/register" className="text-primary hover:underline">
               Sign up
             </Link>
+            <div className="mt-2 text-xs text-muted-foreground">Veldr.io v{APP_VERSION}</div>
           </div>
         </CardContent>
       </Card>
