@@ -1,4 +1,4 @@
-"use client"
+{`"use client"
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -271,21 +271,18 @@ export default function AlertsPage() {
   }
 
   const formatTimestamp = (timestamp: string): string => {
-    if (!isClient) return ""
-    
     try {
       const date = new Date(timestamp)
-      const now = new Date()
-      const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
-
-      if (diffInHours < 1) {
-        const diffInMinutes = Math.floor(diffInHours * 60)
-        return `${diffInMinutes} minutes ago`
-      } else if (diffInHours < 24) {
-        return `${Math.floor(diffInHours)} hours ago`
-      } else {
-        return date.toLocaleDateString()
+      // Use consistent date formatting for both server and client
+      const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false
       }
+      return date.toLocaleString('en-US', options)
     } catch (error) {
       console.error("Error formatting timestamp:", error)
       return "Invalid date"
@@ -483,9 +480,9 @@ export default function AlertsPage() {
                 return (
                   <Card
                     key={alert.id}
-                    className={`transition-all hover:shadow-md ${
+                    className={\`transition-all hover:shadow-md \${
                       alert.resolved ? "bg-gray-50 border-gray-200" : "bg-white border-gray-300"
-                    } ${alert.riskLevel === "Critical" && !alert.resolved ? "border-l-4 border-l-red-500" : ""}`}
+                    } \${alert.riskLevel === "Critical" && !alert.resolved ? "border-l-4 border-l-red-500" : ""}\`}
                   >
                     <CardContent className="pt-6">
                       <div className="flex flex-col lg:flex-row gap-4">
@@ -551,7 +548,7 @@ export default function AlertsPage() {
                                 <h4 className="text-sm font-medium mb-1">Notes:</h4>
                                 <ul className="text-sm text-gray-600 space-y-1">
                                   {alert.notes.map((note, index) => (
-                                    <li key={`${alert.id}-note-${index}`} className="flex items-start">
+                                    <li key={\`\${alert.id}-note-\${index}\`} className="flex items-start">
                                       <span className="w-2 h-2 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0" />
                                       {note}
                                     </li>
@@ -563,7 +560,7 @@ export default function AlertsPage() {
                         </div>
                         <div className="flex flex-col gap-2 lg:w-auto w-full">
                           {alert.audioUrl && (
-                            <Button size="sm\" variant=\"outline\" className=\"w-full lg:w-auto">
+                            <Button size="sm" variant="outline" className="w-full lg:w-auto">
                               <Volume2 className="h-3 w-3 mr-1" />
                               Play Audio
                             </Button>
@@ -604,4 +601,4 @@ export default function AlertsPage() {
       </main>
     </div>
   )
-}
+}`}
