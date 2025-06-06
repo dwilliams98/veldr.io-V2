@@ -67,11 +67,11 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <Shield className="h-12 w-12 text-blue-600" />
+            <Shield className="h-12 w-12 text-primary" />
           </div>
           <CardTitle className="text-2xl">Create Account</CardTitle>
           <CardDescription>Join Veldr.io to protect your loved ones</CardDescription>
@@ -148,8 +148,8 @@ export default function RegisterPage() {
           </form>
 
           <div className="mt-6 text-center text-sm">
-            <span className="text-gray-600">Already have an account? </span>
-            <Link href="/login" className="text-blue-600 hover:underline">
+            <span className="text-muted-foreground">Already have an account? </span>
+            <Link href="/login" className="text-primary hover:underline">
               Sign in
             </Link>
           </div>

@@ -178,7 +178,7 @@ export default function MonitoringPage() {
   }
 
   const getStatusColor = (status: string): string => {
-    return status === "active" ? "text-green-600" : "text-gray-400"
+    return status === "active" ? "text-green-600" : "text-muted-foreground"
   }
 
   const getRiskBadgeColor = (type: string) => {
@@ -217,24 +217,24 @@ export default function MonitoringPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <Shield className="h-12 w-12 text-blue-600 mx-auto mb-4 animate-pulse" />
-          <p className="text-gray-600">Loading monitoring services...</p>
+          <Shield className="h-12 w-12 text-primary mx-auto mb-4 animate-pulse" />
+          <p className="text-muted-foreground">Loading monitoring services...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navbar />
 
       <main className="container mx-auto px-4 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Service Monitoring</h1>
-            <p className="text-gray-600">Manage protection across all connected services</p>
+            <h1 className="text-3xl font-bold text-foreground">Service Monitoring</h1>
+            <p className="text-muted-foreground">Manage protection across all connected services</p>
           </div>
           <Button onClick={handleConnectService}>
             <Plus className="h-4 w-4 mr-2" />
@@ -256,7 +256,7 @@ export default function MonitoringPage() {
                   <CardHeader>
                     <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                       <div className="flex items-center space-x-4">
-                        <div className="p-3 rounded-lg bg-gray-100">
+                        <div className="p-3 rounded-lg bg-muted">
                           <service.icon className={`h-6 w-6 ${getStatusColor(service.status)}`} />
                         </div>
                         <div>
@@ -281,7 +281,7 @@ export default function MonitoringPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <h4 className="font-medium mb-2">Features</h4>
-                        <ul className="text-sm text-gray-600 space-y-1">
+                        <ul className="text-sm text-muted-foreground space-y-1">
                           {service.features.map((feature, index) => (
                             <li key={`${service.id}-feature-${index}`} className="flex items-center">
                               <CheckCircle className="h-3 w-3 text-green-600 mr-2 flex-shrink-0" />
@@ -292,13 +292,13 @@ export default function MonitoringPage() {
                       </div>
                       <div className="space-y-3">
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Status:</span>
+                          <span className="text-muted-foreground">Status:</span>
                           <span className={getStatusColor(service.status)}>
                             {service.status === "active" ? "Active" : "Inactive"}
                           </span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Last Check:</span>
+                          <span className="text-muted-foreground">Last Check:</span>
                           <span>{service.lastCheck}</span>
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -330,32 +330,32 @@ export default function MonitoringPage() {
               <CardContent className="space-y-4">
                 {alerts.length === 0 ? (
                   <div className="text-center py-8">
-                    <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">No alerts at this time</p>
+                    <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No alerts at this time</p>
                   </div>
                 ) : (
                   alerts.map((alert) => (
                     <div
                       key={alert.id}
                       className={`p-4 border rounded-lg transition-colors ${
-                        alert.resolved ? "bg-gray-50 border-gray-200" : "bg-white border-gray-300"
+                        alert.resolved ? "bg-muted/50 border-border" : "bg-card border-border"
                       }`}
                     >
                       <div className="flex flex-col sm:flex-row items-start justify-between mb-2 gap-2">
                         <div className="flex items-center space-x-3">
                           <Badge variant={getRiskBadgeColor(alert.type)}>{alert.type}</Badge>
                           <span className="text-sm font-medium">{alert.service}</span>
-                          <span className="text-sm text-gray-500">•</span>
-                          <span className="text-sm text-gray-600">{alert.elder}</span>
+                          <span className="text-sm text-muted-foreground">•</span>
+                          <span className="text-sm text-muted-foreground">{alert.elder}</span>
                         </div>
                         <div className="flex items-center space-x-2">
                           {alert.resolved && <CheckCircle className="h-4 w-4 text-green-600" />}
-                          <span className="text-xs text-gray-500" suppressHydrationWarning>
+                          <span className="text-xs text-muted-foreground" suppressHydrationWarning>
                             {formatTimestamp(alert.timestamp)}
                           </span>
                         </div>
                       </div>
-                      <p className="text-gray-700 mb-3">{alert.message}</p>
+                      <p className="text-foreground mb-3">{alert.message}</p>
                       {!alert.resolved && (
                         <div className="flex flex-wrap gap-2">
                           <Button size="sm" variant="outline" onClick={() => handleResolveAlert(alert.id)}>
@@ -386,21 +386,21 @@ export default function MonitoringPage() {
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
                         <p className="font-medium">Real-time notifications</p>
-                        <p className="text-sm text-gray-600">Get instant alerts for critical threats</p>
+                        <p className="text-sm text-muted-foreground">Get instant alerts for critical threats</p>
                       </div>
                       <Switch defaultChecked />
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
                         <p className="font-medium">Daily summary emails</p>
-                        <p className="text-sm text-gray-600">Receive daily monitoring reports</p>
+                        <p className="text-sm text-muted-foreground">Receive daily monitoring reports</p>
                       </div>
                       <Switch defaultChecked />
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
                         <p className="font-medium">SMS alerts for critical threats</p>
-                        <p className="text-sm text-gray-600">Send SMS for high-priority alerts</p>
+                        <p className="text-sm text-muted-foreground">Send SMS for high-priority alerts</p>
                       </div>
                       <Switch />
                     </div>
@@ -413,7 +413,7 @@ export default function MonitoringPage() {
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
                         <p className="font-medium">High sensitivity mode</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           Detect more potential threats (may increase false positives)
                         </p>
                       </div>
@@ -422,7 +422,7 @@ export default function MonitoringPage() {
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
                         <p className="font-medium">Learning mode</p>
-                        <p className="text-sm text-gray-600">Allow AI to learn from your feedback</p>
+                        <p className="text-sm text-muted-foreground">Allow AI to learn from your feedback</p>
                       </div>
                       <Switch defaultChecked />
                     </div>
@@ -435,14 +435,14 @@ export default function MonitoringPage() {
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
                         <p className="font-medium">Keep alert history</p>
-                        <p className="text-sm text-gray-600">Retain alerts for analysis and reporting</p>
+                        <p className="text-sm text-muted-foreground">Retain alerts for analysis and reporting</p>
                       </div>
                       <Switch defaultChecked />
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
                         <p className="font-medium">Auto-delete resolved alerts</p>
-                        <p className="text-sm text-gray-600">Automatically remove resolved alerts after 30 days</p>
+                        <p className="text-sm text-muted-foreground">Automatically remove resolved alerts after 30 days</p>
                       </div>
                       <Switch />
                     </div>

@@ -49,11 +49,11 @@ export default function Navbar() {
   ]
 
   return (
-    <header className="border-b bg-white sticky top-0 z-50">
+    <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link href={isAuthenticated ? "/dashboard" : "/"} className="flex items-center space-x-2">
-          <Shield className="h-8 w-8 text-blue-600" />
-          <span className="text-2xl font-bold text-gray-900">Veldr.io</span>
+          <Shield className="h-8 w-8 text-primary" />
+          <span className="text-2xl font-bold text-primary">Veldr.io</span>
         </Link>
 
         {isAuthenticated && (
@@ -64,8 +64,8 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`text-gray-600 hover:text-gray-900 transition-colors ${
-                    pathname === link.href ? "text-blue-600 font-medium" : ""
+                  className={`text-muted-foreground hover:text-foreground transition-colors ${
+                    pathname === link.href ? "text-primary font-medium" : ""
                   }`}
                 >
                   {link.label}
@@ -123,14 +123,14 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isAuthenticated && isMobileMenuOpen && (
-          <div className="absolute top-full left-0 right-0 bg-white border-b shadow-lg md:hidden">
+          <div className="absolute top-full left-0 right-0 bg-card border-b shadow-lg md:hidden">
             <nav className="container mx-auto px-4 py-4 space-y-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`block py-2 text-gray-600 hover:text-gray-900 transition-colors ${
-                    pathname === link.href ? "text-blue-600 font-medium" : ""
+                  className={`block py-2 text-muted-foreground hover:text-foreground transition-colors ${
+                    pathname === link.href ? "text-primary font-medium" : ""
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >

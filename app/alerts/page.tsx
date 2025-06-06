@@ -1,4 +1,4 @@
-{`"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -307,10 +307,10 @@ export default function AlertsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <AlertTriangle className="h-12 w-12 text-blue-600 mx-auto mb-4 animate-pulse" />
-          <p className="text-gray-600">Loading alerts...</p>
+          <AlertTriangle className="h-12 w-12 text-primary mx-auto mb-4 animate-pulse" />
+          <p className="text-muted-foreground">Loading alerts...</p>
         </div>
       </div>
     )
@@ -321,15 +321,15 @@ export default function AlertsPage() {
   const recentAlerts = alerts.filter((alert) => new Date(alert.timestamp) > new Date(Date.now() - 24 * 60 * 60 * 1000))
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navbar />
 
       <main className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Security Alerts</h1>
-            <p className="text-gray-600">Monitor and manage fraud detection alerts</p>
+            <h1 className="text-3xl font-bold text-foreground">Security Alerts</h1>
+            <p className="text-muted-foreground">Monitor and manage fraud detection alerts</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline">
@@ -377,10 +377,10 @@ export default function AlertsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Recent</CardTitle>
-              <Clock className="h-4 w-4 text-blue-500" />
+              <Clock className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{recentAlerts.length}</div>
+              <div className="text-2xl font-bold text-primary">{recentAlerts.length}</div>
               <p className="text-xs text-muted-foreground">Last 24 hours</p>
             </CardContent>
           </Card>
@@ -392,7 +392,7 @@ export default function AlertsPage() {
             <div className="flex flex-col lg:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                   <Input
                     placeholder="Search alerts by title, elder name, or description..."
                     value={searchTerm}
@@ -465,9 +465,9 @@ export default function AlertsPage() {
             {filteredAlerts.length === 0 ? (
               <Card>
                 <CardContent className="text-center py-12">
-                  <AlertTriangle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No alerts found</h3>
-                  <p className="text-gray-500">
+                  <AlertTriangle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">No alerts found</h3>
+                  <p className="text-muted-foreground">
                     {searchTerm || filterChannel !== "all" || filterRisk !== "all" || filterStatus !== "all"
                       ? "Try adjusting your search or filters"
                       : "No alerts match the current criteria"}
@@ -480,9 +480,9 @@ export default function AlertsPage() {
                 return (
                   <Card
                     key={alert.id}
-                    className={\`transition-all hover:shadow-md \${
-                      alert.resolved ? "bg-gray-50 border-gray-200" : "bg-white border-gray-300"
-                    } \${alert.riskLevel === "Critical" && !alert.resolved ? "border-l-4 border-l-red-500" : ""}\`}
+                    className={`transition-all hover:shadow-md ${
+                      alert.resolved ? "bg-muted/50 border-border" : "bg-card border-border"
+                    } ${alert.riskLevel === "Critical" && !alert.resolved ? "border-l-4 border-l-red-500" : ""}`}
                   >
                     <CardContent className="pt-6">
                       <div className="flex flex-col lg:flex-row gap-4">
@@ -499,7 +499,7 @@ export default function AlertsPage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between mb-2">
                               <div className="flex items-center space-x-2">
-                                <IconComponent className="h-4 w-4 text-gray-500" />
+                                <IconComponent className="h-4 w-4 text-muted-foreground" />
                                 <Badge variant={getRiskBadgeColor(alert.riskLevel)}>{alert.riskLevel}</Badge>
                                 <Badge variant="outline">{alert.channel}</Badge>
                                 {alert.escalated && <Badge variant="destructive">Escalated</Badge>}
@@ -532,24 +532,24 @@ export default function AlertsPage() {
                               </DropdownMenu>
                             </div>
                             <h3 className="font-semibold text-lg mb-1">{alert.title}</h3>
-                            <p className="text-sm text-gray-600 mb-2">
-                              <strong>{alert.elderName}</strong> • <span className="text-xs text-gray-500" suppressHydrationWarning>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              <strong>{alert.elderName}</strong> • <span className="text-xs text-muted-foreground" suppressHydrationWarning>
                                 {formatTimestamp(alert.timestamp)}
                               </span>
                             </p>
-                            <p className="text-gray-700 mb-3">{alert.description}</p>
+                            <p className="text-foreground mb-3">{alert.description}</p>
                             {alert.transcript && (
-                              <div className="bg-gray-50 p-3 rounded-lg mb-3">
-                                <p className="text-sm text-gray-700 italic">&quot;{alert.transcript}&quot;</p>
+                              <div className="bg-muted p-3 rounded-lg mb-3">
+                                <p className="text-sm text-foreground italic">&quot;{alert.transcript}&quot;</p>
                               </div>
                             )}
                             {alert.notes.length > 0 && (
                               <div className="mb-3">
                                 <h4 className="text-sm font-medium mb-1">Notes:</h4>
-                                <ul className="text-sm text-gray-600 space-y-1">
+                                <ul className="text-sm text-muted-foreground space-y-1">
                                   {alert.notes.map((note, index) => (
-                                    <li key={\`\${alert.id}-note-\${index}\`} className="flex items-start">
-                                      <span className="w-2 h-2 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0" />
+                                    <li key={`${alert.id}-note-${index}`} className="flex items-start">
+                                      <span className="w-2 h-2 bg-muted-foreground rounded-full mt-2 mr-2 flex-shrink-0" />
                                       {note}
                                     </li>
                                   ))}
@@ -601,4 +601,4 @@ export default function AlertsPage() {
       </main>
     </div>
   )
-}`}
+}
