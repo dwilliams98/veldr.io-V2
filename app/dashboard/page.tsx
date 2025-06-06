@@ -283,7 +283,7 @@ export default function Dashboard() {
                   </div>
                   <div className="text-right">
                     {elder.recentAlerts > 0 && (
-                      <Badge variant="destructive" className="mb-2">
+                      <Badge variant="destructive\" className="mb-2">
                         {elder.recentAlerts} alerts
                       </Badge>
                     )}
@@ -327,7 +327,7 @@ export default function Dashboard() {
                   <p className="text-sm text-gray-600 mb-3">{alert.transcript}</p>
                   <div className="flex flex-wrap gap-2">
                     {alert.audioUrl && (
-                      <Button size="sm" variant="outline">
+                      <Button size="sm\" variant="outline">
                         <Volume2 className="h-3 w-3 mr-1" />
                         Play Audio
                       </Button>
