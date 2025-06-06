@@ -9,171 +9,61 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 import {
   AlertTriangle,
+  Shield,
   Phone,
   Mail,
   CreditCard,
   Database,
   Globe,
   Search,
-  Filter,
   CheckCircle,
   Clock,
   Volume2,
-  ExternalLink,
   MoreVertical,
   Archive,
   Flag,
+  RefreshCw,
+  Download,
+  Eye,
+  AlertCircle,
+  Info,
+  Pause,
+  MessageSquare,
 } from "lucide-react"
 import Navbar from "@/components/navbar"
-
-// Type definitions for Alert management
-interface Alert {
-  id: string
-  elderId: string
-  elderName: string
-  elderPhoto: string
-  channel: "Phone" | "Email" | "Banking" | "Social Media" | "Data Breach"
-  riskLevel: "Critical" | "Warning" | "Info"
-  title: string
-  description: string
-  transcript?: string
-  timestamp: string
-  resolved: boolean
-  escalated: boolean
-  audioUrl?: string
-  metadata: Record<string, any>
-  assignedTo?: string
-  notes: string[]
-}
-
-// Mock comprehensive alerts data
-const mockAlerts: Alert[] = [
-  {
-    id: "1",
-    elderId: "1",
-    elderName: "Margaret Johnson",
-    elderPhoto: "/placeholder.svg?height=40&width=40",
-    channel: "Phone",
-    riskLevel: "Critical",
-    title: "Suspicious Phone Call - Social Security Scam",
-    description: "Caller requesting Social Security number and bank account details",
-    transcript:
-      "We detected a suspicious call. The caller was asking for your Social Security number and bank account details. This appears to be a scam attempt.",
-    timestamp: "2024-01-15T14:30:00Z",
-    resolved: false,
-    escalated: false,
-    audioUrl: "#",
-    metadata: {
-      callerNumber: "+1-800-555-SCAM",
-      duration: "2:34",
-      confidence: 0.95,
-      keywords: ["Social Security", "bank account", "urgent"],
-    },
-    notes: [],
-  },
-  {
-    id: "2",
-    elderId: "2",
-    elderName: "Robert Smith",
-    elderPhoto: "/placeholder.svg?height=40&width=40",
-    channel: "Banking",
-    riskLevel: "Critical",
-    title: "Unusual Wire Transfer Attempt",
-    description: "Large wire transfer to unknown account blocked",
-    timestamp: "2024-01-15T09:45:00Z",
-    resolved: false,
-    escalated: true,
-    metadata: {
-      amount: 2500,
-      recipientAccount: "****7892",
-      bank: "Chase Bank",
-      blocked: true,
-      location: "Unknown",
-    },
-    notes: ["Contacted elder - confirmed not authorized", "Bank notified and account secured"],
-  },
-  {
-    id: "3",
-    elderId: "1",
-    elderName: "Margaret Johnson",
-    elderPhoto: "/placeholder.svg?height=40&width=40",
-    channel: "Email",
-    riskLevel: "Warning",
-    title: "Phishing Email Detected",
-    description: "Suspicious email claiming to be from Medicare",
-    timestamp: "2024-01-15T12:15:00Z",
-    resolved: true,
-    escalated: false,
-    metadata: {
-      sender: "medicare-benefits@fake-domain.com",
-      subject: "Urgent: Verify Your Medicare Benefits",
-      maliciousLinks: 3,
-      quarantined: true,
-    },
-    notes: ["Email automatically quarantined", "Elder notified about phishing attempt"],
-  },
-  {
-    id: "4",
-    elderId: "1",
-    elderName: "Margaret Johnson",
-    elderPhoto: "/placeholder.svg?height=40&width=40",
-    channel: "Data Breach",
-    riskLevel: "Warning",
-    title: "Personal Information in Data Breach",
-    description: "Email and phone number found in healthcare data breach",
-    timestamp: "2024-01-14T18:20:00Z",
-    resolved: false,
-    escalated: false,
-    metadata: {
-      breachSource: "MedCorp Healthcare",
-      exposedData: ["email", "phone", "patient_id"],
-      affectedRecords: 50000,
-      breachDate: "2024-01-10T00:00:00Z",
-    },
-    notes: ["Recommended password changes", "Credit monitoring activated"],
-  },
-  {
-    id: "5",
-    elderId: "3",
-    elderName: "Dorothy Williams",
-    elderPhoto: "/placeholder.svg?height=40&width=40",
-    channel: "Social Media",
-    riskLevel: "Info",
-    title: "Privacy Settings Updated",
-    description: "Facebook privacy settings were automatically adjusted",
-    timestamp: "2024-01-14T10:30:00Z",
-    resolved: true,
-    escalated: false,
-    metadata: {
-      platform: "Facebook",
-      changes: ["Profile visibility", "Friend request settings"],
-      reason: "Suspicious friend requests detected",
-    },
-    notes: ["Settings updated automatically", "Elder notified of changes"],
-  },
-]
+import { useApp } from "@/contexts/app-context"
 
 export default function AlertsPage() {
-  const [alerts, setAlerts] = useState<Alert[]>(mockAlerts)
-  const [filteredAlerts, setFilteredAlerts] = useState<Alert[]>(mockAlerts)
+  const { alerts, resolveAlert, escalateAlert, archiveAlert, addNote, refreshData, exportData } = useApp()
+  const [filteredAlerts, setFilteredAlerts] = useState(alerts)
   const [searchTerm, setSearchTerm] = useState("")
   const [filterChannel, setFilterChannel] = useState<string>("all")
   const [filterRisk, setFilterRisk] = useState<string>("all")
-  const [filterStatus, setFilterStatus] = useState<"all" | "unresolved" | "resolved">("all")
+  const [filterStatus, setFilterStatus] = useState<string>("all")
+  const [sortBy, setSortBy] = useState<string>("timestamp")
   const [activeTab, setActiveTab] = useState("all")
   const [isLoading, setIsLoading] = useState(true)
-  const [isClient, setIsClient] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [playingAudio, setPlayingAudio] = useState<string | null>(null)
+  const [noteDialog, setNoteDialog] = useState<{ open: boolean; alertId: string }>({ open: false, alertId: "" })
+  const [newNote, setNewNote] = useState("")
   const router = useRouter()
 
   useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  useEffect(() => {
-    if (!isClient) return
-
     // Check authentication
     const token = localStorage.getItem("veldr_token")
     if (!token) {
@@ -184,11 +74,9 @@ export default function AlertsPage() {
     // Simulate loading
     const timer = setTimeout(() => setIsLoading(false), 500)
     return () => clearTimeout(timer)
-  }, [router, isClient])
+  }, [router])
 
   useEffect(() => {
-    if (!isClient) return
-
     // Apply filters and search
     let filtered = alerts
 
@@ -214,11 +102,7 @@ export default function AlertsPage() {
 
     // Status filter
     if (filterStatus !== "all") {
-      filtered = filtered.filter((alert) => {
-        if (filterStatus === "resolved") return alert.resolved
-        if (filterStatus === "unresolved") return !alert.resolved
-        return true
-      })
+      filtered = filtered.filter((alert) => alert.status === filterStatus)
     }
 
     // Tab filter
@@ -230,14 +114,28 @@ export default function AlertsPage() {
       } else if (activeTab === "recent") {
         const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
         filtered = filtered.filter((alert) => new Date(alert.timestamp) > oneDayAgo)
+      } else if (activeTab === "unresolved") {
+        filtered = filtered.filter((alert) => !alert.resolved)
       }
     }
 
-    // Sort by timestamp (newest first)
-    filtered.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    // Sort alerts
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "timestamp":
+          return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        case "priority":
+          const priorityOrder = { high: 3, medium: 2, low: 1 }
+          return priorityOrder[b.priority] - priorityOrder[a.priority]
+        case "elder":
+          return a.elderName.localeCompare(b.elderName)
+        default:
+          return 0
+      }
+    })
 
     setFilteredAlerts(filtered)
-  }, [alerts, searchTerm, filterChannel, filterRisk, filterStatus, activeTab, isClient])
+  }, [alerts, searchTerm, filterChannel, filterRisk, filterStatus, activeTab, sortBy])
 
   const getRiskBadgeColor = (riskLevel: string) => {
     switch (riskLevel) {
@@ -249,6 +147,19 @@ export default function AlertsPage() {
         return "default"
       default:
         return "default"
+    }
+  }
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "new":
+        return <AlertCircle className="h-4 w-4 text-red-500" />
+      case "reviewed":
+        return <Eye className="h-4 w-4 text-yellow-500" />
+      case "resolved":
+        return <CheckCircle className="h-4 w-4 text-green-500" />
+      default:
+        return <Info className="h-4 w-4 text-gray-500" />
     }
   }
 
@@ -265,51 +176,69 @@ export default function AlertsPage() {
       case "Data Breach":
         return Database
       default:
-        return AlertTriangle
+        return Shield
     }
   }
 
   const formatTimestamp = (timestamp: string): string => {
     try {
       const date = new Date(timestamp)
-      // Use consistent date formatting for both server and client
-      const options: Intl.DateTimeFormatOptions = {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-        hour12: false,
+      const now = new Date()
+      const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+
+      if (diffInHours < 1) {
+        return "Just now"
+      } else if (diffInHours < 24) {
+        return `${diffInHours}h ago`
+      } else {
+        const options: Intl.DateTimeFormatOptions = {
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+        }
+        return date.toLocaleString("en-US", options)
       }
-      return date.toLocaleString("en-US", options)
     } catch (error) {
       console.error("Error formatting timestamp:", error)
       return "Invalid date"
     }
   }
 
-  const handleResolveAlert = (alertId: string) => {
-    setAlerts((prev) => prev.map((alert) => (alert.id === alertId ? { ...alert, resolved: true } : alert)))
+  const handlePlayAudio = (alertId: string) => {
+    if (playingAudio === alertId) {
+      setPlayingAudio(null)
+    } else {
+      setPlayingAudio(alertId)
+      // Simulate audio playback
+      setTimeout(() => setPlayingAudio(null), 3000)
+    }
   }
 
-  const handleEscalateAlert = (alertId: string) => {
-    setAlerts((prev) => prev.map((alert) => (alert.id === alertId ? { ...alert, escalated: true } : alert)))
+  const handleAddNote = () => {
+    if (newNote.trim()) {
+      addNote(noteDialog.alertId, newNote.trim())
+      setNewNote("")
+      setNoteDialog({ open: false, alertId: "" })
+    }
   }
 
-  const handleArchiveAlert = (alertId: string) => {
-    setAlerts((prev) => prev.filter((alert) => alert.id !== alertId))
+  const handleRefresh = async () => {
+    setIsRefreshing(true)
+    await refreshData()
+    setIsRefreshing(false)
   }
 
-  if (!isClient) {
-    return null
+  const handleExport = () => {
+    exportData("alerts")
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <AlertTriangle className="h-12 w-12 text-veldr-primary mx-auto mb-4 animate-pulse" />
-          <p className="text-gray-600">Loading alerts...</p>
+          <AlertTriangle className="h-12 w-12 text-primary mx-auto mb-4 animate-pulse" />
+          <p className="text-muted-foreground">Loading alerts...</p>
         </div>
       </div>
     )
@@ -318,300 +247,389 @@ export default function AlertsPage() {
   const criticalAlerts = alerts.filter((alert) => alert.riskLevel === "Critical" && !alert.resolved)
   const escalatedAlerts = alerts.filter((alert) => alert.escalated && !alert.resolved)
   const recentAlerts = alerts.filter((alert) => new Date(alert.timestamp) > new Date(Date.now() - 24 * 60 * 60 * 1000))
+  const unresolvedAlerts = alerts.filter((alert) => !alert.resolved)
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
+    <TooltipProvider>
+      <div className="min-h-screen bg-background">
+        <Navbar />
 
-      <main className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Security Alerts</h1>
-            <p className="text-gray-600">Monitor and manage fraud detection alerts</p>
+        <main className="container mx-auto px-4 py-8">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Security Alerts</h1>
+              <p className="text-muted-foreground">Monitor and manage fraud detection alerts across all channels</p>
+            </div>
+            <div className="flex gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
+                    <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Refresh alerts</TooltipContent>
+              </Tooltip>
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="border-veldr-primary text-veldr-primary hover:bg-veldr-primary/10">
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <Card className="relative overflow-hidden">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Alerts</CardTitle>
+                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{alerts.length}</div>
+                <p className="text-xs text-muted-foreground">All time</p>
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Critical</CardTitle>
+                <Flag className="h-4 w-4 text-red-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-red-600">{criticalAlerts.length}</div>
+                <p className="text-xs text-muted-foreground">Unresolved</p>
+                {criticalAlerts.length > 0 && <div className="absolute bottom-0 left-0 w-full h-1 bg-red-500"></div>}
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Escalated</CardTitle>
+                <AlertTriangle className="h-4 w-4 text-orange-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-orange-600">{escalatedAlerts.length}</div>
+                <p className="text-xs text-muted-foreground">Needs attention</p>
+                {escalatedAlerts.length > 0 && (
+                  <div className="absolute bottom-0 left-0 w-full h-1 bg-orange-500"></div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Recent</CardTitle>
+                <Clock className="h-4 w-4 text-primary" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-primary">{recentAlerts.length}</div>
+                <p className="text-xs text-muted-foreground">Last 24 hours</p>
+              </CardContent>
+            </Card>
           </div>
-        </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Alerts</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{alerts.length}</div>
-              <p className="text-xs text-muted-foreground">All time</p>
-            </CardContent>
-          </Card>
+          {/* Filters */}
+          <Card className="mb-8">
+            <CardContent className="pt-6">
+              <div className="flex flex-col lg:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input
+                      placeholder="Search alerts by title, elder name, or description..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Select value={filterChannel} onValueChange={setFilterChannel}>
+                    <SelectTrigger className="w-[140px]">
+                      <SelectValue placeholder="Channel" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Channels</SelectItem>
+                      <SelectItem value="phone">Phone</SelectItem>
+                      <SelectItem value="email">Email</SelectItem>
+                      <SelectItem value="banking">Banking</SelectItem>
+                      <SelectItem value="social media">Social Media</SelectItem>
+                      <SelectItem value="data breach">Data Breach</SelectItem>
+                    </SelectContent>
+                  </Select>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Critical</CardTitle>
-              <Flag className="h-4 w-4 text-red-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">{criticalAlerts.length}</div>
-              <p className="text-xs text-muted-foreground">Unresolved</p>
-            </CardContent>
-          </Card>
+                  <Select value={filterRisk} onValueChange={setFilterRisk}>
+                    <SelectTrigger className="w-[120px]">
+                      <SelectValue placeholder="Risk" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Risk</SelectItem>
+                      <SelectItem value="critical">Critical</SelectItem>
+                      <SelectItem value="warning">Warning</SelectItem>
+                      <SelectItem value="info">Info</SelectItem>
+                    </SelectContent>
+                  </Select>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Escalated</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-orange-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-orange-600">{escalatedAlerts.length}</div>
-              <p className="text-xs text-muted-foreground">Needs attention</p>
-            </CardContent>
-          </Card>
+                  <Select value={filterStatus} onValueChange={setFilterStatus}>
+                    <SelectTrigger className="w-[120px]">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="new">New</SelectItem>
+                      <SelectItem value="reviewed">Reviewed</SelectItem>
+                      <SelectItem value="resolved">Resolved</SelectItem>
+                    </SelectContent>
+                  </Select>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Recent</CardTitle>
-              <Clock className="h-4 w-4 text-veldr-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-veldr-primary">{recentAlerts.length}</div>
-              <p className="text-xs text-muted-foreground">Last 24 hours</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Filters */}
-        <Card className="mb-8">
-          <CardContent className="pt-6">
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <Input
-                    placeholder="Search alerts by title, elder name, or description..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 border-gray-300 focus:border-veldr-primary focus:ring-veldr-primary"
-                  />
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-[120px]">
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="timestamp">Time</SelectItem>
+                      <SelectItem value="priority">Priority</SelectItem>
+                      <SelectItem value="elder">Elder</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="border-gray-300 hover:border-veldr-primary hover:bg-veldr-primary/10"
+            </CardContent>
+          </Card>
+
+          {/* Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="all" className="relative">
+                All Alerts
+                <Badge variant="secondary" className="ml-2 text-xs">
+                  {alerts.length}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="unresolved" className="relative">
+                Unresolved
+                <Badge variant="destructive" className="ml-2 text-xs">
+                  {unresolvedAlerts.length}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="critical" className="relative">
+                Critical
+                <Badge variant="destructive" className="ml-2 text-xs">
+                  {criticalAlerts.length}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="escalated" className="relative">
+                Escalated
+                <Badge variant="secondary" className="ml-2 text-xs">
+                  {escalatedAlerts.length}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="recent" className="relative">
+                Recent
+                <Badge variant="outline" className="ml-2 text-xs">
+                  {recentAlerts.length}
+                </Badge>
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value={activeTab} className="space-y-4">
+              {filteredAlerts.length === 0 ? (
+                <Card>
+                  <CardContent className="text-center py-12">
+                    <AlertTriangle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-foreground mb-2">No alerts found</h3>
+                    <p className="text-muted-foreground">
+                      {searchTerm || filterChannel !== "all" || filterRisk !== "all" || filterStatus !== "all"
+                        ? "Try adjusting your search or filters"
+                        : "No alerts match the current criteria"}
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                filteredAlerts.map((alert) => {
+                  const IconComponent = getChannelIcon(alert.channel)
+                  return (
+                    <Card
+                      key={alert.id}
+                      className={`transition-all hover:shadow-md ${
+                        alert.resolved ? "bg-muted/30 border-border" : "bg-card border-border"
+                      } ${alert.riskLevel === "Critical" && !alert.resolved ? "border-l-4 border-l-red-500" : ""}`}
                     >
-                      <Filter className="h-4 w-4 mr-2" />
-                      Channel: {filterChannel}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => setFilterChannel("all")}>All</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterChannel("phone")}>Phone</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterChannel("email")}>Email</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterChannel("banking")}>Banking</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterChannel("social media")}>Social Media</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterChannel("data breach")}>Data Breach</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="border-gray-300 hover:border-veldr-primary hover:bg-veldr-primary/10"
-                    >
-                      <AlertTriangle className="h-4 w-4 mr-2" />
-                      Risk: {filterRisk}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => setFilterRisk("all")}>All</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterRisk("critical")}>Critical</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterRisk("warning")}>Warning</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterRisk("info")}>Info</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="border-gray-300 hover:border-veldr-primary hover:bg-veldr-primary/10"
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Status: {filterStatus}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => setFilterStatus("all")}>All</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterStatus("unresolved")}>Unresolved</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterStatus("resolved")}>Resolved</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="all">All Alerts</TabsTrigger>
-            <TabsTrigger value="critical">Critical</TabsTrigger>
-            <TabsTrigger value="escalated">Escalated</TabsTrigger>
-            <TabsTrigger value="recent">Recent</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value={activeTab} className="space-y-4">
-            {filteredAlerts.length === 0 ? (
-              <Card>
-                <CardContent className="text-center py-12">
-                  <AlertTriangle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No alerts found</h3>
-                  <p className="text-gray-500">
-                    {searchTerm || filterChannel !== "all" || filterRisk !== "all" || filterStatus !== "all"
-                      ? "Try adjusting your search or filters"
-                      : "No alerts match the current criteria"}
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              filteredAlerts.map((alert) => {
-                const IconComponent = getChannelIcon(alert.channel)
-                return (
-                  <Card
-                    key={alert.id}
-                    className={`transition-all hover:shadow-md ${
-                      alert.resolved ? "bg-gray-50 border-gray-200" : "bg-white border-gray-300"
-                    } ${alert.riskLevel === "Critical" && !alert.resolved ? "border-l-4 border-l-red-500" : ""}`}
-                  >
-                    <CardContent className="pt-6">
-                      <div className="flex flex-col lg:flex-row gap-4">
-                        <div className="flex items-start space-x-4 flex-1">
-                          <Avatar className="h-12 w-12">
-                            <AvatarImage src={alert.elderPhoto || "/placeholder.svg"} alt={alert.elderName} />
-                            <AvatarFallback>
-                              {alert.elderName
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between mb-2">
-                              <div className="flex items-center space-x-2">
-                                <IconComponent className="h-4 w-4 text-gray-500" />
-                                <Badge variant={getRiskBadgeColor(alert.riskLevel)}>{alert.riskLevel}</Badge>
-                                <Badge variant="outline">{alert.channel}</Badge>
-                                {alert.escalated && <Badge variant="destructive">Escalated</Badge>}
-                                {alert.resolved && <CheckCircle className="h-4 w-4 text-green-600" />}
+                      <CardContent className="pt-6">
+                        <div className="flex flex-col lg:flex-row gap-4">
+                          <div className="flex items-start space-x-4 flex-1">
+                            <Avatar className="h-12 w-12">
+                              <AvatarImage src={alert.elderPhoto || "/placeholder.svg"} alt={alert.elderName} />
+                              <AvatarFallback>
+                                {alert.elderName
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between mb-2">
+                                <div className="flex items-center space-x-2 flex-wrap">
+                                  <IconComponent className="h-4 w-4 text-muted-foreground" />
+                                  <Badge variant={getRiskBadgeColor(alert.riskLevel)}>{alert.riskLevel}</Badge>
+                                  <Badge variant="outline">{alert.channel}</Badge>
+                                  {alert.escalated && <Badge variant="destructive">Escalated</Badge>}
+                                  <div className="flex items-center gap-1">
+                                    {getStatusIcon(alert.status)}
+                                    <span className="text-xs text-muted-foreground capitalize">{alert.status}</span>
+                                  </div>
+                                </div>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                      <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    {!alert.resolved && (
+                                      <DropdownMenuItem onClick={() => resolveAlert(alert.id)}>
+                                        <CheckCircle className="h-4 w-4 mr-2" />
+                                        Mark Resolved
+                                      </DropdownMenuItem>
+                                    )}
+                                    {!alert.escalated && !alert.resolved && (
+                                      <DropdownMenuItem onClick={() => escalateAlert(alert.id)}>
+                                        <Flag className="h-4 w-4 mr-2" />
+                                        Escalate
+                                      </DropdownMenuItem>
+                                    )}
+                                    <DropdownMenuItem onClick={() => archiveAlert(alert.id)}>
+                                      <Archive className="h-4 w-4 mr-2" />
+                                      Archive
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                               </div>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm">
-                                    <MoreVertical className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  {!alert.resolved && (
-                                    <DropdownMenuItem onClick={() => handleResolveAlert(alert.id)}>
-                                      <CheckCircle className="h-4 w-4 mr-2" />
-                                      Mark Resolved
-                                    </DropdownMenuItem>
-                                  )}
-                                  {!alert.escalated && !alert.resolved && (
-                                    <DropdownMenuItem onClick={() => handleEscalateAlert(alert.id)}>
-                                      <Flag className="h-4 w-4 mr-2" />
-                                      Escalate
-                                    </DropdownMenuItem>
-                                  )}
-                                  <DropdownMenuItem onClick={() => handleArchiveAlert(alert.id)}>
-                                    <Archive className="h-4 w-4 mr-2" />
-                                    Archive
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                              <h3 className="font-semibold text-lg mb-1">{alert.title}</h3>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                <strong>{alert.elderName}</strong> •{" "}
+                                <span className="text-xs text-muted-foreground" suppressHydrationWarning>
+                                  {formatTimestamp(alert.timestamp)}
+                                </span>
+                              </p>
+                              <p className="text-foreground mb-3">{alert.description}</p>
+                              {alert.transcript && (
+                                <div className="bg-muted p-3 rounded-lg mb-3">
+                                  <p className="text-sm text-foreground italic">&quot;{alert.transcript}&quot;</p>
+                                </div>
+                              )}
+                              {alert.notes.length > 0 && (
+                                <div className="mb-3">
+                                  <h4 className="text-sm font-medium mb-1">Notes:</h4>
+                                  <ul className="text-sm text-muted-foreground space-y-1">
+                                    {alert.notes.map((note, index) => (
+                                      <li key={`${alert.id}-note-${index}`} className="flex items-start">
+                                        <span className="w-2 h-2 bg-muted-foreground rounded-full mt-2 mr-2 flex-shrink-0" />
+                                        {note}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
                             </div>
-                            <h3 className="font-semibold text-lg mb-1">{alert.title}</h3>
-                            <p className="text-sm text-gray-600 mb-2">
-                              <strong>{alert.elderName}</strong> •{" "}
-                              <span className="text-xs text-gray-500" suppressHydrationWarning>
-                                {formatTimestamp(alert.timestamp)}
-                              </span>
-                            </p>
-                            <p className="text-gray-700 mb-3">{alert.description}</p>
-                            {alert.transcript && (
-                              <div className="bg-gray-50 p-3 rounded-lg mb-3">
-                                <p className="text-sm text-gray-700 italic">&quot;{alert.transcript}&quot;</p>
-                              </div>
-                            )}
-                            {alert.notes.length > 0 && (
-                              <div className="mb-3">
-                                <h4 className="text-sm font-medium mb-1">Notes:</h4>
-                                <ul className="text-sm text-gray-600 space-y-1">
-                                  {alert.notes.map((note, index) => (
-                                    <li key={`${alert.id}-note-${index}`} className="flex items-start">
-                                      <span className="w-2 h-2 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0" />
-                                      {note}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
                           </div>
-                        </div>
-                        <div className="flex flex-col gap-2 lg:w-auto w-full">
-                          {alert.audioUrl && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="w-full lg:w-auto hover:bg-veldr-primary/10 hover:text-veldr-primary"
-                            >
-                              <Volume2 className="h-3 w-3 mr-1" />
-                              Play Audio
-                            </Button>
-                          )}
-                          {!alert.resolved && (
-                            <>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleResolveAlert(alert.id)}
-                                className="w-full lg:w-auto hover:bg-veldr-primary/10 hover:text-veldr-primary"
-                              >
-                                <CheckCircle className="h-3 w-3 mr-1" />
-                                Mark Safe
-                              </Button>
-                              {!alert.escalated && (
+                          <div className="flex flex-col gap-2 lg:w-auto w-full">
+                            {alert.audioUrl && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="w-full lg:w-auto"
+                                    onClick={() => handlePlayAudio(alert.id)}
+                                  >
+                                    {playingAudio === alert.id ? (
+                                      <Pause className="h-3 w-3 mr-1" />
+                                    ) : (
+                                      <Volume2 className="h-3 w-3 mr-1" />
+                                    )}
+                                    {playingAudio === alert.id ? "Playing..." : "Play Audio"}
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Listen to call recording</TooltipContent>
+                              </Tooltip>
+                            )}
+                            {!alert.resolved && (
+                              <>
                                 <Button
                                   size="sm"
-                                  variant="destructive"
-                                  onClick={() => handleEscalateAlert(alert.id)}
+                                  variant="outline"
+                                  onClick={() => resolveAlert(alert.id)}
                                   className="w-full lg:w-auto"
                                 >
-                                  <Flag className="h-3 w-3 mr-1" />
-                                  Escalate
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Mark Safe
                                 </Button>
-                              )}
-                            </>
-                          )}
+                                {!alert.escalated && (
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => escalateAlert(alert.id)}
+                                    className="w-full lg:w-auto"
+                                  >
+                                    <Flag className="h-3 w-3 mr-1" />
+                                    Escalate
+                                  </Button>
+                                )}
+                              </>
+                            )}
+                            <Dialog
+                              open={noteDialog.open && noteDialog.alertId === alert.id}
+                              onOpenChange={(open) => setNoteDialog({ open, alertId: open ? alert.id : "" })}
+                            >
+                              <DialogTrigger asChild>
+                                <Button size="sm" variant="outline" className="w-full lg:w-auto">
+                                  <MessageSquare className="h-3 w-3 mr-1" />
+                                  Add Note
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Add Note to Alert</DialogTitle>
+                                  <DialogDescription>
+                                    Add additional information or context about this alert.
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-4">
+                                  <div>
+                                    <Label htmlFor="note">Note</Label>
+                                    <Textarea
+                                      id="note"
+                                      placeholder="Enter your note here..."
+                                      value={newNote}
+                                      onChange={(e) => setNewNote(e.target.value)}
+                                    />
+                                  </div>
+                                  <div className="flex justify-end gap-2">
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => setNoteDialog({ open: false, alertId: "" })}
+                                    >
+                                      Cancel
+                                    </Button>
+                                    <Button onClick={handleAddNote} disabled={!newNote.trim()}>
+                                      Add Note
+                                    </Button>
+                                  </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              })
-            )}
-          </TabsContent>
-        </Tabs>
-      </main>
-    </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })
+              )}
+            </TabsContent>
+          </Tabs>
+        </main>
+      </div>
+    </TooltipProvider>
   )
 }
