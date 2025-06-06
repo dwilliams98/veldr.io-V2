@@ -101,10 +101,10 @@ const mockRecentAlerts: Alert[] = [
 ]
 
 const mockServices: MonitoringService[] = [
-  { name: "Phone Monitoring", status: "Active", alerts: 2, icon: Phone, color: "text-primary" },
+  { name: "Phone Monitoring", status: "Active", alerts: 2, icon: Phone, color: "text-blue-600" },
   { name: "Email Protection", status: "Active", alerts: 1, icon: Mail, color: "text-green-600" },
   { name: "Banking Alerts", status: "Active", alerts: 1, icon: CreditCard, color: "text-purple-600" },
-  { name: "Social Media", status: "Inactive", alerts: 0, icon: Users, color: "text-muted-foreground" },
+  { name: "Social Media", status: "Inactive", alerts: 0, icon: Users, color: "text-gray-400" },
   { name: "Data Breach Monitor", status: "Active", alerts: 1, icon: AlertTriangle, color: "text-orange-600" },
 ]
 
@@ -153,25 +153,25 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Shield className="h-12 w-12 text-primary mx-auto mb-4 animate-pulse" />
-          <p className="text-muted-foreground">Loading dashboard...</p>
+          <Shield className="h-12 w-12 text-blue-600 mx-auto mb-4 animate-pulse" />
+          <p className="text-gray-600">Loading dashboard...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
 
       <main className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-            <p className="text-muted-foreground">Monitor and protect your loved ones</p>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600">Monitor and protect your loved ones</p>
           </div>
           <Link href="/elders/new">
             <Button>
@@ -236,7 +236,7 @@ export default function Dashboard() {
                 <div key={`service-${index}`} className="text-center p-4 border rounded-lg">
                   <service.icon className={`h-8 w-8 mx-auto mb-2 ${service.color}`} />
                   <h3 className="font-medium text-sm">{service.name}</h3>
-                  <p className={`text-xs ${service.status === "Active" ? "text-green-600" : "text-muted-foreground"}`}>
+                  <p className={`text-xs ${service.status === "Active" ? "text-green-600" : "text-gray-500"}`}>
                     {service.status}
                   </p>
                   {service.alerts > 0 && (
@@ -272,22 +272,22 @@ export default function Dashboard() {
                     </Avatar>
                     <div>
                       <h3 className="font-medium">{elder.name}</h3>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-gray-600">
                         {elder.relationship} • Age {elder.age}
                       </p>
                       <div className="flex items-center space-x-2 mt-1">
-                        <Phone className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">{elder.phoneNumber}</span>
+                        <Phone className="h-3 w-3 text-gray-400" />
+                        <span className="text-xs text-gray-500">{elder.phoneNumber}</span>
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
                     {elder.recentAlerts > 0 && (
-                      <Badge variant="destructive" className="mb-2">
+                      <Badge variant="destructive\" className="mb-2">
                         {elder.recentAlerts} alerts
                       </Badge>
                     )}
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-500">
                       <Clock className="h-3 w-3 inline mr-1" />
                       {elder.lastActivity}
                     </p>
@@ -313,21 +313,21 @@ export default function Dashboard() {
                 <div key={alert.id} className="p-4 border rounded-lg">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center space-x-2">
-                      <alert.icon className="h-4 w-4 text-muted-foreground" />
+                      <alert.icon className="h-4 w-4 text-gray-500" />
                       <div>
                         <h4 className="font-medium">{alert.elderName}</h4>
-                        <p className="text-xs text-muted-foreground">{alert.serviceType}</p>
+                        <p className="text-xs text-gray-500">{alert.serviceType}</p>
                       </div>
                       <Badge variant={getRiskBadgeColor(alert.riskLevel)}>{alert.riskLevel}</Badge>
                     </div>
-                    <span className="text-xs text-muted-foreground" suppressHydrationWarning>
+                    <span className="text-xs text-gray-500" suppressHydrationWarning>
                       {formatTimestamp(alert.timestamp)}
                     </span>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-3">{alert.transcript}</p>
+                  <p className="text-sm text-gray-600 mb-3">{alert.transcript}</p>
                   <div className="flex flex-wrap gap-2">
                     {alert.audioUrl && (
-                      <Button size="sm" variant="outline">
+                      <Button size="sm\" variant="outline">
                         <Volume2 className="h-3 w-3 mr-1" />
                         Play Audio
                       </Button>

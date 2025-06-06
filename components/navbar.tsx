@@ -13,7 +13,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Shield, Settings, LogOut, User, Menu } from "lucide-react"
+import { Settings, LogOut, User, Menu } from "lucide-react"
+import VeldrLogo from "@/components/veldr-logo"
 
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -49,11 +50,10 @@ export default function Navbar() {
   ]
 
   return (
-    <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
+    <header className="border-b bg-white sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link href={isAuthenticated ? "/dashboard" : "/"} className="flex items-center space-x-2">
-          <Shield className="h-8 w-8 text-primary" />
-          <span className="text-2xl font-bold text-primary">Veldr.io</span>
+          <VeldrLogo size="md" />
         </Link>
 
         {isAuthenticated && (
@@ -64,8 +64,8 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`text-muted-foreground hover:text-foreground transition-colors ${
-                    pathname === link.href ? "text-primary font-medium" : ""
+                  className={`text-gray-600 hover:text-veldr-primary transition-colors font-medium ${
+                    pathname === link.href ? "text-veldr-primary" : ""
                   }`}
                 >
                   {link.label}
@@ -77,20 +77,20 @@ export default function Navbar() {
             <Button
               variant="ghost"
               size="sm"
-              className="md:hidden"
+              className="md:hidden hover:bg-veldr-primary/10"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="h-5 w-5 text-veldr-primary" />
             </Button>
 
             {/* User Menu */}
             <div className="hidden md:block">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-veldr-primary/10">
+                    <Avatar className="h-8 w-8 ring-2 ring-veldr-primary/20">
                       <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                      <AvatarFallback>JD</AvatarFallback>
+                      <AvatarFallback className="bg-veldr-gradient text-white">JD</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -102,16 +102,16 @@ export default function Navbar() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-veldr-primary/10">
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-veldr-primary/10">
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
+                  <DropdownMenuItem onClick={handleLogout} className="hover:bg-red-50 text-red-600">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
                   </DropdownMenuItem>
@@ -123,14 +123,14 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isAuthenticated && isMobileMenuOpen && (
-          <div className="absolute top-full left-0 right-0 bg-card border-b shadow-lg md:hidden">
+          <div className="absolute top-full left-0 right-0 bg-white border-b shadow-lg md:hidden">
             <nav className="container mx-auto px-4 py-4 space-y-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`block py-2 text-muted-foreground hover:text-foreground transition-colors ${
-                    pathname === link.href ? "text-primary font-medium" : ""
+                  className={`block py-2 text-gray-600 hover:text-veldr-primary transition-colors font-medium ${
+                    pathname === link.href ? "text-veldr-primary" : ""
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -138,7 +138,11 @@ export default function Navbar() {
                 </Link>
               ))}
               <div className="pt-4 border-t">
-                <Button variant="ghost" onClick={handleLogout} className="w-full justify-start">
+                <Button
+                  variant="ghost"
+                  onClick={handleLogout}
+                  className="w-full justify-start text-red-600 hover:bg-red-50"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </Button>

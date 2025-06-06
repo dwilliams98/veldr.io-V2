@@ -226,9 +226,9 @@ export default function EldersPage() {
       case "error":
         return "text-red-600"
       case "disconnected":
-        return "text-muted-foreground"
+        return "text-gray-400"
       default:
-        return "text-muted-foreground"
+        return "text-gray-400"
     }
   }
 
@@ -253,25 +253,25 @@ export default function EldersPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Shield className="h-12 w-12 text-primary mx-auto mb-4 animate-pulse" />
-          <p className="text-muted-foreground">Loading elders...</p>
+          <Shield className="h-12 w-12 text-blue-600 mx-auto mb-4 animate-pulse" />
+          <p className="text-gray-600">Loading elders...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
 
       <main className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Protected Elders</h1>
-            <p className="text-muted-foreground">Manage and monitor your loved ones&apos; protection</p>
+            <h1 className="text-3xl font-bold text-gray-900">Protected Elders</h1>
+            <p className="text-gray-600">Manage and monitor your loved ones&apos; protection</p>
           </div>
           <Link href="/elders/new">
             <Button>
@@ -287,7 +287,7 @@ export default function EldersPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <Input
                     placeholder="Search by name, relationship, or phone..."
                     value={searchTerm}
@@ -334,9 +334,9 @@ export default function EldersPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredElders.length === 0 ? (
             <div className="col-span-full text-center py-12">
-              <Shield className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-foreground mb-2">No elders found</h3>
-              <p className="text-muted-foreground mb-4">
+              <Shield className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No elders found</h3>
+              <p className="text-gray-500 mb-4">
                 {searchTerm || filterStatus !== "all" || filterRisk !== "all"
                   ? "Try adjusting your search or filters"
                   : "Get started by adding your first elder"}
@@ -407,11 +407,11 @@ export default function EldersPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <Phone className="h-4 w-4 text-gray-400" />
                       <span>{elder.phoneNumber}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Mail className="h-4 w-4 text-muted-foreground" />
+                      <Mail className="h-4 w-4 text-gray-400" />
                       <span>{elder.email}</span>
                     </div>
                   </div>
@@ -429,7 +429,7 @@ export default function EldersPage() {
                                   ? "bg-green-50 border-green-200"
                                   : service.status === "error"
                                     ? "bg-red-50 border-red-200"
-                                    : "bg-muted border-border"
+                                    : "bg-gray-50 border-gray-200"
                               }`}
                             >
                               <IconComponent className={`h-4 w-4 mx-auto ${getServiceStatusColor(service.status)}`} />
@@ -443,14 +443,14 @@ export default function EldersPage() {
                         )
                       })}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
+                    <p className="text-xs text-gray-500 mt-2">
                       {getConnectedServicesCount(elder.connectedServices)} of {elder.connectedServices.length} services
                       connected
                     </p>
                   </div>
 
                   <div className="flex justify-between items-center pt-2 border-t">
-                    <span className="text-xs text-muted-foreground">Last activity: {elder.lastActivity}</span>
+                    <span className="text-xs text-gray-500">Last activity: {elder.lastActivity}</span>
                     <Link href={`/elders/${elder.id}`}>
                       <Button size="sm" variant="outline">
                         View Details
