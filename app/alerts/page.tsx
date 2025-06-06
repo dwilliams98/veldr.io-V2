@@ -561,7 +561,7 @@ export default function AlertsPage() {
                         </div>
                         <div className="flex flex-col gap-2 lg:w-auto w-full">
                           {alert.audioUrl && (
-                            <Button size="sm" variant="outline" className="w-full lg:w-auto">
+                            <Button size="sm\" variant="outline\" className="w-full lg:w-auto">
                               <Volume2 className="h-3 w-3 mr-1" />
                               Play Audio
                             </Button>
