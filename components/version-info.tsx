@@ -67,7 +67,7 @@ export function VersionInfo() {
 
             <div className="text-muted-foreground">Status</div>
             <div className="font-medium flex items-center gap-1.5">
-              <Badge variant="success" className="bg-green-500 text-white">
+              <Badge variant="default" className="bg-green-500 text-white">
                 Latest
               </Badge>
               <span>Up to date</span>
@@ -113,3 +113,5 @@ export function VersionInfo() {
     </Dialog>
   )
 }
+
+export default VersionInfo
