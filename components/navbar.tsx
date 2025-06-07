@@ -15,9 +15,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Shield, Settings, LogOut, User, Menu, Bell, HelpCircle, AlertTriangle, CheckCircle } from "lucide-react"
+import { Settings, LogOut, User, Menu, Bell, HelpCircle, AlertTriangle, CheckCircle } from "lucide-react"
 import { useApp } from "@/contexts/app-context"
 import { APP_VERSION } from "@/config/version"
+import { VeldrLogo } from "@/components/veldr-logo"
 
 export default function Navbar() {
   const { user, notifications, markNotificationAsRead, markAllNotificationsAsRead, setUser } = useApp()
@@ -48,17 +49,14 @@ export default function Navbar() {
   }
 
   const handleProfileClick = () => {
-    // Navigate to profile page (to be implemented)
     console.log("Navigate to profile")
   }
 
   const handleSettingsClick = () => {
-    // Navigate to settings page (to be implemented)
     console.log("Navigate to settings")
   }
 
   const handleHelpClick = () => {
-    // Open help center or support
     window.open("https://help.veldr.io", "_blank")
   }
 
@@ -78,19 +76,18 @@ export default function Navbar() {
       case "success":
         return <CheckCircle className="h-4 w-4 text-green-500" />
       default:
-        return <Bell className="h-4 w-4 text-blue-500" />
+        return <Bell className="h-4 w-4 text-primary" />
     }
   }
 
   return (
-    <header className="border-b bg-card/95 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+    <header className="border-b bg-card/95 backdrop-blur-sm sticky top-0 z-50 shadow-sm border-border/50">
+      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <Link
           href={isAuthenticated ? "/dashboard" : "/"}
-          className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+          className="flex items-center hover:opacity-80 transition-opacity"
         >
-          <Shield className="h-8 w-8 text-primary" />
-          <span className="text-2xl font-bold text-primary">Veldr.io</span>
+          <VeldrLogo size="lg" variant="full" />
         </Link>
 
         {isAuthenticated && (
@@ -101,9 +98,9 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-accent/10 ${
                     pathname === link.href
-                      ? "text-primary bg-primary/10 border border-primary/20"
+                      ? "text-primary bg-primary/10 border border-primary/20 shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
@@ -117,20 +114,20 @@ export default function Navbar() {
               {/* Notifications */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="relative">
+                  <Button variant="ghost" size="sm" className="relative hover:bg-accent/10">
                     <Bell className="h-5 w-5" />
                     {unreadCount > 0 && (
                       <Badge
                         variant="destructive"
-                        className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
+                        className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs bg-primary text-white"
                       >
                         {unreadCount}
                       </Badge>
                     )}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-80">
-                  <div className="flex items-center justify-between p-3 border-b">
+                <DropdownMenuContent align="end" className="w-80 veldr-card">
+                  <div className="flex items-center justify-between p-3 border-b border-border/50">
                     <h3 className="font-semibold">Notifications</h3>
                     {unreadCount > 0 && (
                       <Button variant="ghost" size="sm" onClick={markAllNotificationsAsRead} className="text-xs">
@@ -148,7 +145,7 @@ export default function Navbar() {
                       notifications.map((notification) => (
                         <div
                           key={notification.id}
-                          className={`p-3 border-b last:border-b-0 hover:bg-muted/50 cursor-pointer ${
+                          className={`p-3 border-b last:border-b-0 hover:bg-accent/5 cursor-pointer transition-colors ${
                             !notification.read ? "bg-primary/5" : ""
                           }`}
                           onClick={() => markNotificationAsRead(notification.id)}
@@ -171,14 +168,14 @@ export default function Navbar() {
               </DropdownMenu>
 
               {/* Help */}
-              <Button variant="ghost" size="sm" onClick={handleHelpClick}>
+              <Button variant="ghost" size="sm" onClick={handleHelpClick} className="hover:bg-accent/10">
                 <HelpCircle className="h-5 w-5" />
               </Button>
 
               {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-accent/10">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={user?.avatar || "/placeholder.svg?height=32&width=32"} alt="User" />
                       <AvatarFallback className="bg-primary/10 text-primary">
@@ -190,7 +187,7 @@ export default function Navbar() {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuContent className="w-56 veldr-card" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
@@ -229,14 +226,14 @@ export default function Navbar() {
                     {unreadCount > 0 && (
                       <Badge
                         variant="destructive"
-                        className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-xs"
+                        className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-xs bg-primary text-white"
                       >
                         {unreadCount}
                       </Badge>
                     )}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-72">
+                <DropdownMenuContent align="end" className="w-72 veldr-card">
                   <div className="flex items-center justify-between p-3 border-b">
                     <h3 className="font-semibold text-sm">Notifications</h3>
                     {unreadCount > 0 && (
@@ -272,11 +269,10 @@ export default function Navbar() {
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-80">
+                <SheetContent side="right" className="w-80 veldr-card">
                   <SheetHeader>
                     <SheetTitle className="flex items-center space-x-2">
-                      <Shield className="h-6 w-6 text-primary" />
-                      <span>Veldr.io</span>
+                      <VeldrLogo size="md" variant="text" />
                       <Badge variant="outline" className="ml-2 text-xs">
                         v{APP_VERSION}
                       </Badge>
@@ -289,10 +285,10 @@ export default function Navbar() {
                       <Link
                         key={link.href}
                         href={link.href}
-                        className={`block px-3 py-3 rounded-md text-sm font-medium transition-colors ${
+                        className={`block px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
                           pathname === link.href
                             ? "text-primary bg-primary/10 border border-primary/20"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                            : "text-muted-foreground hover:text-foreground hover:bg-accent/10"
                         }`}
                         onClick={() => setIsMobileMenuOpen(false)}
                       >

@@ -9,8 +9,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Shield, Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff } from "lucide-react"
 import { APP_VERSION } from "@/config/version"
+import { VeldrLogo } from "@/components/veldr-logo"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -40,11 +41,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md veldr-card-premium">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <Shield className="h-12 w-12 text-primary" />
+          <div className="flex justify-center mb-6">
+            <VeldrLogo size="lg" variant="full" />
           </div>
           <CardTitle className="text-2xl">Welcome Back</CardTitle>
           <CardDescription>Sign in to your Veldr.io account</CardDescription>
@@ -60,6 +61,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="border-border/50 focus:border-primary"
               />
             </div>
 
@@ -73,6 +75,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className="border-border/50 focus:border-primary pr-10"
                 />
                 <Button
                   type="button"
@@ -86,17 +89,17 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full btn-veldr-primary text-white" disabled={isLoading}>
               {isLoading ? "Signing In..." : "Sign In"}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm">
             <span className="text-muted-foreground">Don&apos;t have an account? </span>
-            <Link href="/register" className="text-primary hover:underline">
+            <Link href="/register" className="text-primary hover:underline font-medium">
               Sign up
             </Link>
-            <div className="mt-2 text-xs text-muted-foreground">Veldr.io v{APP_VERSION}</div>
+            <div className="mt-3 text-xs text-muted-foreground">Veldr.io v{APP_VERSION}</div>
           </div>
         </CardContent>
       </Card>
