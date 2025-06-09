@@ -144,7 +144,14 @@ export default function Dashboard() {
 
   const formatTimestamp = (timestamp: string) => {
     try {
-      return new Date(timestamp).toLocaleString()
+      return new Date(timestamp).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      })
     } catch (error) {
       console.error("Error formatting timestamp:", error)
       return "Invalid date"
@@ -320,7 +327,7 @@ export default function Dashboard() {
                       </div>
                       <Badge variant={getRiskBadgeColor(alert.riskLevel)}>{alert.riskLevel}</Badge>
                     </div>
-                    <span className="text-xs text-muted-foreground" suppressHydrationWarning>
+                    <span className="text-xs text-muted-foreground">
                       {formatTimestamp(alert.timestamp)}
                     </span>
                   </div>

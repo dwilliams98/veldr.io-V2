@@ -72,6 +72,22 @@ export default function ElderDetailPage() {
     }
   }
 
+  const formatTimestamp = (timestamp: string) => {
+    try {
+      return new Date(timestamp).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      })
+    } catch (error) {
+      console.error("Error formatting timestamp:", error)
+      return "Invalid date"
+    }
+  }
+
   const handlePlayAudio = (logId: string) => {
     if (playingAudio === logId) {
       setPlayingAudio(null)
@@ -146,8 +162,8 @@ export default function ElderDetailPage() {
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center space-x-3">
                         <Badge variant={getRiskBadgeColor(log.riskLevel)}>{log.riskLevel}</Badge>
-                        <span className="text-xs text-gray-500" suppressHydrationWarning>
-                          {new Date(log.timestamp).toLocaleString()}
+                        <span className="text-xs text-gray-500">
+                          {formatTimestamp(log.timestamp)}
                         </span>
                         <span className="text-sm text-gray-500">Duration: {log.duration}</span>
                       </div>

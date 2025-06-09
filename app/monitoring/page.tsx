@@ -196,7 +196,14 @@ export default function MonitoringPage() {
 
   const formatTimestamp = (timestamp: string): string => {
     try {
-      return new Date(timestamp).toLocaleString()
+      return new Date(timestamp).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      })
     } catch (error) {
       console.error("Error formatting timestamp:", error)
       return "Invalid date"
@@ -350,7 +357,7 @@ export default function MonitoringPage() {
                         </div>
                         <div className="flex items-center space-x-2">
                           {alert.resolved && <CheckCircle className="h-4 w-4 text-green-600" />}
-                          <span className="text-xs text-muted-foreground" suppressHydrationWarning>
+                          <span className="text-xs text-muted-foreground">
                             {formatTimestamp(alert.timestamp)}
                           </span>
                         </div>
