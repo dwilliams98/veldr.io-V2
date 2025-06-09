@@ -533,14 +533,14 @@ export default function AlertsPage() {
                             </div>
                             <h3 className="font-semibold text-lg mb-1">{alert.title}</h3>
                             <p className="text-sm text-muted-foreground mb-2">
-                              <strong>{alert.elderName}</strong> • <span className="text-xs text-muted-foreground" suppressHydrationWarning>
-                                {formatTimestamp(alert.timestamp)}
+                              <strong>{alert.elderName}</strong> • <span className="text-xs text-muted-foreground">
+                                {isClient ? formatTimestamp(alert.timestamp) : alert.timestamp}
                               </span>
                             </p>
                             <p className="text-foreground mb-3">{alert.description}</p>
                             {alert.transcript && (
                               <div className="bg-muted p-3 rounded-lg mb-3">
-                                <p className="text-sm text-foreground italic">&quot;{alert.transcript}&quot;</p>
+                                <p className="text-sm text-foreground italic">"{alert.transcript}"</p>
                               </div>
                             )}
                             {alert.notes.length > 0 && (

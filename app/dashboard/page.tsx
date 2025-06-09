@@ -112,7 +112,12 @@ export default function Dashboard() {
   const [elders] = useState<Elder[]>(mockElders)
   const [alerts] = useState<Alert[]>(mockRecentAlerts)
   const [isLoading, setIsLoading] = useState(true)
+  const [isClient, setIsClient] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   useEffect(() => {
     // Check authentication
@@ -328,7 +333,7 @@ export default function Dashboard() {
                       <Badge variant={getRiskBadgeColor(alert.riskLevel)}>{alert.riskLevel}</Badge>
                     </div>
                     <span className="text-xs text-muted-foreground">
-                      {formatTimestamp(alert.timestamp)}
+                      {isClient ? formatTimestamp(alert.timestamp) : alert.timestamp}
                     </span>
                   </div>
                   <p className="text-sm text-muted-foreground mb-3">{alert.transcript}</p>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -58,6 +58,11 @@ export default function ElderDetailPage() {
   const [elder] = useState(mockElder)
   const [voiceLogs] = useState(mockVoiceLogs)
   const [playingAudio, setPlayingAudio] = useState<string | null>(null)
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   const getRiskBadgeColor = (level: string) => {
     switch (level) {
@@ -163,7 +168,7 @@ export default function ElderDetailPage() {
                       <div className="flex items-center space-x-3">
                         <Badge variant={getRiskBadgeColor(log.riskLevel)}>{log.riskLevel}</Badge>
                         <span className="text-xs text-gray-500">
-                          {formatTimestamp(log.timestamp)}
+                          {isClient ? formatTimestamp(log.timestamp) : log.timestamp}
                         </span>
                         <span className="text-sm text-gray-500">Duration: {log.duration}</span>
                       </div>
