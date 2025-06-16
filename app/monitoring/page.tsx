@@ -259,7 +259,7 @@ export default function MonitoringPage() {
           <TabsContent value="services" className="space-y-6">
             <div className="grid gap-6">
               {services.map((service) => (
-                <Card key={service.id}>
+                <Card key={service.id} className="hover:shadow-md transition-shadow">
                   <CardHeader>
                     <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                       <div className="flex items-center space-x-4">
@@ -344,7 +344,7 @@ export default function MonitoringPage() {
                   alerts.map((alert) => (
                     <div
                       key={alert.id}
-                      className={`p-4 border rounded-lg transition-colors ${
+                      className={`p-4 border rounded-lg transition-colors hover:shadow-sm ${
                         alert.resolved ? "bg-muted/50 border-border" : "bg-card border-border"
                       }`}
                     >

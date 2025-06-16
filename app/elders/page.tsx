@@ -284,7 +284,7 @@ export default function EldersPage() {
         {/* Filters and Search */}
         <Card className="mb-8">
           <CardContent className="pt-6">
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-6">
               <div className="flex-1">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -296,7 +296,7 @@ export default function EldersPage() {
                   />
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline">
@@ -350,7 +350,7 @@ export default function EldersPage() {
             </div>
           ) : (
             filteredElders.map((elder) => (
-              <Card key={elder.id} className="hover:shadow-lg transition-shadow">
+              <Card key={elder.id} className="hover:shadow-lg hover:border-primary transition-all">
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-4">
@@ -424,11 +424,11 @@ export default function EldersPage() {
                         return (
                           <div key={`${elder.id}-service-${index}`} className="text-center">
                             <div
-                              className={`p-2 rounded-lg border ${
+                              className={`p-2 rounded-lg border-2 ${
                                 service.status === "connected"
-                                  ? "bg-green-50 border-green-200"
+                                  ? "bg-green-50 border-green-500"
                                   : service.status === "error"
-                                    ? "bg-red-50 border-red-200"
+                                    ? "bg-red-50 border-red-500"
                                     : "bg-muted border-border"
                               }`}
                             >

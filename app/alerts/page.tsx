@@ -341,7 +341,7 @@ export default function AlertsPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Alerts</CardTitle>
               <AlertTriangle className="h-4 w-4 text-muted-foreground" />
@@ -352,7 +352,7 @@ export default function AlertsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Critical</CardTitle>
               <Flag className="h-4 w-4 text-red-500" />
@@ -363,7 +363,7 @@ export default function AlertsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Escalated</CardTitle>
               <AlertTriangle className="h-4 w-4 text-orange-500" />
@@ -374,7 +374,7 @@ export default function AlertsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Recent</CardTitle>
               <Clock className="h-4 w-4 text-primary" />
@@ -389,7 +389,7 @@ export default function AlertsPage() {
         {/* Filters */}
         <Card className="mb-8">
           <CardContent className="pt-6">
-            <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex flex-col lg:flex-row gap-6">
               <div className="flex-1">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -401,7 +401,7 @@ export default function AlertsPage() {
                   />
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline">
@@ -480,7 +480,7 @@ export default function AlertsPage() {
                 return (
                   <Card
                     key={alert.id}
-                    className={`transition-all hover:shadow-md ${
+                    className={`transition-all hover:shadow-lg ${
                       alert.resolved ? "bg-muted/50 border-border" : "bg-card border-border"
                     } ${alert.riskLevel === "Critical" && !alert.resolved ? "border-l-4 border-l-red-500" : ""}`}
                   >
@@ -560,7 +560,7 @@ export default function AlertsPage() {
                         </div>
                         <div className="flex flex-col gap-2 lg:w-auto w-full">
                           {alert.audioUrl && (
-                            <Button size="sm\" variant="outline\" className="w-full lg:w-auto">
+                            <Button size="sm" variant="outline" className="w-full lg:w-auto">
                               <Volume2 className="h-3 w-3 mr-1" />
                               Play Audio
                             </Button>

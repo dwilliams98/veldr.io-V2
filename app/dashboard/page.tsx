@@ -195,7 +195,7 @@ export default function Dashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
+          <Card className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Protected Elders</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
@@ -206,7 +206,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Recent Alerts</CardTitle>
               <AlertTriangle className="h-4 w-4 text-muted-foreground" />
@@ -217,7 +217,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Protection Status</CardTitle>
               <Shield className="h-4 w-4 text-muted-foreground" />
@@ -230,7 +230,7 @@ export default function Dashboard() {
         </div>
 
         {/* Service Monitoring Overview */}
-        <Card className="mb-8">
+        <Card className="mb-8 hover:shadow-md transition-shadow">
           <CardHeader>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
@@ -245,7 +245,7 @@ export default function Dashboard() {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               {mockServices.map((service, index) => (
-                <div key={`service-${index}`} className="text-center p-4 border rounded-lg">
+                <div key={`service-${index}`} className="text-center p-4 border rounded-lg hover:shadow-sm transition-shadow">
                   <service.icon className={`h-8 w-8 mx-auto mb-2 ${service.color}`} />
                   <h3 className="font-medium text-sm">{service.name}</h3>
                   <p className={`text-xs ${service.status === "Active" ? "text-green-600" : "text-muted-foreground"}`}>
@@ -264,14 +264,14 @@ export default function Dashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Elder Profiles */}
-          <Card>
+          <Card className="hover:shadow-md transition-shadow">
             <CardHeader>
               <CardTitle>Protected Elders</CardTitle>
               <CardDescription>Manage your loved ones&apos; protection settings</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {elders.map((elder) => (
-                <div key={elder.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div key={elder.id} className="flex items-center justify-between p-4 border rounded-lg hover:shadow-sm transition-shadow">
                   <div className="flex items-center space-x-4">
                     <Avatar>
                       <AvatarImage src={elder.photoURL || "/placeholder.svg"} alt={elder.name} />
@@ -315,14 +315,14 @@ export default function Dashboard() {
           </Card>
 
           {/* Recent Alerts */}
-          <Card>
+          <Card className="hover:shadow-md transition-shadow">
             <CardHeader>
               <CardTitle>Recent Alerts</CardTitle>
               <CardDescription>Latest fraud detection activities</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {alerts.map((alert) => (
-                <div key={alert.id} className="p-4 border rounded-lg">
+                <div key={alert.id} className="p-4 border rounded-lg hover:shadow-sm transition-shadow">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <alert.icon className="h-4 w-4 text-muted-foreground" />

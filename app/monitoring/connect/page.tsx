@@ -488,7 +488,7 @@ export default function ConnectServicePage() {
                     {getServicesByCategory(category.id).map((service) => (
                       <Card
                         key={service.id}
-                        className="hover:shadow-lg transition-shadow cursor-pointer"
+                        className="hover:shadow-lg hover:border-primary transition-all cursor-pointer"
                         onClick={() => handleServiceSelect(service)}
                       >
                         <CardHeader>
