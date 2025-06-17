@@ -13,7 +13,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Shield, Settings, LogOut, User, Menu } from "lucide-react"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Shield, Settings, LogOut, User, Menu, X } from "lucide-react"
 
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -35,6 +36,7 @@ export default function Navbar() {
         localStorage.removeItem("veldr_token")
       }
       setIsAuthenticated(false)
+      setIsMobileMenuOpen(false)
       router.push("/")
     } catch (error) {
       console.error("Logout error:", error)
@@ -48,23 +50,27 @@ export default function Navbar() {
     { href: "/alerts", label: "Alerts" },
   ]
 
+  const handleNavClick = () => {
+    setIsMobileMenuOpen(false)
+  }
+
   return (
-    <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+    <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50 safe-top">
+      <div className="container mx-auto px-3 mobile:px-4 py-3 mobile:py-4 flex justify-between items-center">
         <Link href={isAuthenticated ? "/dashboard" : "/"} className="flex items-center space-x-2">
-          <Shield className="h-8 w-8 text-primary" />
-          <span className="text-2xl font-bold text-primary">Veldr.io</span>
+          <Shield className="h-6 w-6 mobile:h-8 mobile:w-8 text-primary" />
+          <span className="text-lg mobile:text-2xl font-bold text-primary">Veldr.io</span>
         </Link>
 
         {isAuthenticated && (
           <>
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-6">
+            <nav className="hidden md:flex items-center space-x-4 lg:space-x-6">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`text-muted-foreground hover:text-foreground transition-colors ${
+                  className={`text-sm lg:text-base text-muted-foreground hover:text-foreground transition-colors ${
                     pathname === link.href ? "text-primary font-medium" : ""
                   }`}
                 >
@@ -73,17 +79,79 @@ export default function Navbar() {
               ))}
             </nav>
 
-            {/* Mobile Menu Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="md:hidden"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
+            {/* Mobile Menu */}
+            <div className="md:hidden">
+              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[280px] sm:w-[350px]">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center space-x-2">
+                        <Shield className="h-6 w-6 text-primary" />
+                        <span className="text-lg font-bold text-primary">Veldr.io</span>
+                      </div>
+                    </div>
+                    
+                    <nav className="flex flex-col space-y-3 flex-1">
+                      {navLinks.map((link) => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          onClick={handleNavClick}
+                          className={`flex items-center py-3 px-4 rounded-lg text-base transition-colors ${
+                            pathname === link.href 
+                              ? "bg-primary text-primary-foreground font-medium" 
+                              : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                          }`}
+                        >
+                          {link.label}
+                        </Link>
+                      ))}
+                    </nav>
 
-            {/* User Menu */}
+                    <div className="border-t pt-4 mt-auto">
+                      <div className="flex items-center space-x-3 mb-4 px-4">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src="/placeholder.svg?height=40&width=40" alt="User" />
+                          <AvatarFallback>JD</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">John Doe</p>
+                          <p className="text-xs text-muted-foreground truncate">john@example.com</p>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2 px-4">
+                        <Button variant="ghost" className="w-full justify-start" size="sm">
+                          <User className="mr-2 h-4 w-4" />
+                          Profile
+                        </Button>
+                        <Button variant="ghost" className="w-full justify-start" size="sm">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Settings
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          className="w-full justify-start text-red-600 hover:text-red-600 hover:bg-red-50" 
+                          size="sm"
+                          onClick={handleLogout}
+                        >
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Log out
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+
+            {/* Desktop User Menu */}
             <div className="hidden md:block">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -119,32 +187,6 @@ export default function Navbar() {
               </DropdownMenu>
             </div>
           </>
-        )}
-
-        {/* Mobile Menu */}
-        {isAuthenticated && isMobileMenuOpen && (
-          <div className="absolute top-full left-0 right-0 bg-card border-b shadow-lg md:hidden">
-            <nav className="container mx-auto px-4 py-4 space-y-2">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`block py-2 text-muted-foreground hover:text-foreground transition-colors ${
-                    pathname === link.href ? "text-primary font-medium" : ""
-                  }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <div className="pt-4 border-t">
-                <Button variant="ghost" onClick={handleLogout} className="w-full justify-start">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Log out
-                </Button>
-              </div>
-            </nav>
-          </div>
         )}
       </div>
     </header>

@@ -178,15 +178,15 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-3 mobile:px-4 py-4 mobile:py-6 lg:py-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 mobile:mb-8 gap-3 mobile:gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-            <p className="text-muted-foreground">Monitor and protect your loved ones</p>
+            <h1 className="text-2xl mobile:text-3xl font-bold text-foreground">Dashboard</h1>
+            <p className="text-sm mobile:text-base text-muted-foreground">Monitor and protect your loved ones</p>
           </div>
           <Link href="/elders/new">
-            <Button>
+            <Button className="w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Add Elder
             </Button>
@@ -194,7 +194,7 @@ export default function Dashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 mobile-lg:grid-cols-2 lg:grid-cols-3 gap-4 mobile:gap-6 mb-6 mobile:mb-8">
           <Card className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Protected Elders</CardTitle>
@@ -217,7 +217,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-md transition-shadow">
+          <Card className="hover:shadow-md transition-shadow mobile-lg:col-span-2 lg:col-span-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Protection Status</CardTitle>
               <Shield className="h-4 w-4 text-muted-foreground" />
@@ -230,25 +230,25 @@ export default function Dashboard() {
         </div>
 
         {/* Service Monitoring Overview */}
-        <Card className="mb-8 hover:shadow-md transition-shadow">
+        <Card className="mb-6 mobile:mb-8 hover:shadow-md transition-shadow">
           <CardHeader>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <CardTitle>Service Monitoring</CardTitle>
-                <CardDescription>Connected protection services across all platforms</CardDescription>
+                <CardTitle className="text-lg mobile:text-xl">Service Monitoring</CardTitle>
+                <CardDescription className="text-sm mobile:text-base">Connected protection services across all platforms</CardDescription>
               </div>
               <Link href="/monitoring">
-                <Button variant="outline">Manage Services</Button>
+                <Button variant="outline" className="w-full sm:w-auto">Manage Services</Button>
               </Link>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 mobile-lg:grid-cols-3 lg:grid-cols-5 gap-3 mobile:gap-4">
               {mockServices.map((service, index) => (
-                <div key={`service-${index}`} className="text-center p-4 border rounded-lg hover:shadow-sm transition-shadow">
-                  <service.icon className={`h-8 w-8 mx-auto mb-2 ${service.color}`} />
-                  <h3 className="font-medium text-sm">{service.name}</h3>
-                  <p className={`text-xs ${service.status === "Active" ? "text-green-600" : "text-muted-foreground"}`}>
+                <div key={`service-${index}`} className="text-center p-3 mobile:p-4 border rounded-lg hover:shadow-sm transition-shadow">
+                  <service.icon className={`h-6 w-6 mobile:h-8 mobile:w-8 mx-auto mb-2 ${service.color}`} />
+                  <h3 className="font-medium text-xs mobile:text-sm leading-tight">{service.name}</h3>
+                  <p className={`text-xs mt-1 ${service.status === "Active" ? "text-green-600" : "text-muted-foreground"}`}>
                     {service.status}
                   </p>
                   {service.alerts > 0 && (
@@ -262,18 +262,18 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mobile:gap-8">
           {/* Elder Profiles */}
           <Card className="hover:shadow-md transition-shadow">
             <CardHeader>
-              <CardTitle>Protected Elders</CardTitle>
-              <CardDescription>Manage your loved ones&apos; protection settings</CardDescription>
+              <CardTitle className="text-lg mobile:text-xl">Protected Elders</CardTitle>
+              <CardDescription className="text-sm mobile:text-base">Manage your loved ones&apos; protection settings</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {elders.map((elder) => (
-                <div key={elder.id} className="flex items-center justify-between p-4 border rounded-lg hover:shadow-sm transition-shadow">
-                  <div className="flex items-center space-x-4">
-                    <Avatar>
+                <div key={elder.id} className="flex items-center justify-between p-3 mobile:p-4 border rounded-lg hover:shadow-sm transition-shadow">
+                  <div className="flex items-center space-x-3 mobile:space-x-4 min-w-0 flex-1">
+                    <Avatar className="h-10 w-10 mobile:h-12 mobile:w-12 flex-shrink-0">
                       <AvatarImage src={elder.photoURL || "/placeholder.svg"} alt={elder.name} />
                       <AvatarFallback>
                         {elder.name
@@ -282,29 +282,29 @@ export default function Dashboard() {
                           .join("")}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <h3 className="font-medium">{elder.name}</h3>
-                      <p className="text-sm text-muted-foreground">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-medium text-sm mobile:text-base truncate">{elder.name}</h3>
+                      <p className="text-xs mobile:text-sm text-muted-foreground">
                         {elder.relationship} • Age {elder.age}
                       </p>
                       <div className="flex items-center space-x-2 mt-1">
-                        <Phone className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">{elder.phoneNumber}</span>
+                        <Phone className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                        <span className="text-xs text-muted-foreground truncate">{elder.phoneNumber}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right flex-shrink-0 ml-2">
                     {elder.recentAlerts > 0 && (
-                      <Badge variant="destructive" className="mb-2">
+                      <Badge variant="destructive" className="mb-2 text-xs">
                         {elder.recentAlerts} alerts
                       </Badge>
                     )}
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground mb-2">
                       <Clock className="h-3 w-3 inline mr-1" />
                       {elder.lastActivity}
                     </p>
                     <Link href={`/elders/${elder.id}`}>
-                      <Button variant="outline" size="sm" className="mt-2">
+                      <Button variant="outline" size="sm" className="text-xs">
                         View Details
                       </Button>
                     </Link>
@@ -317,37 +317,39 @@ export default function Dashboard() {
           {/* Recent Alerts */}
           <Card className="hover:shadow-md transition-shadow">
             <CardHeader>
-              <CardTitle>Recent Alerts</CardTitle>
-              <CardDescription>Latest fraud detection activities</CardDescription>
+              <CardTitle className="text-lg mobile:text-xl">Recent Alerts</CardTitle>
+              <CardDescription className="text-sm mobile:text-base">Latest fraud detection activities</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {alerts.map((alert) => (
-                <div key={alert.id} className="p-4 border rounded-lg hover:shadow-sm transition-shadow">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                      <alert.icon className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <h4 className="font-medium">{alert.elderName}</h4>
+                <div key={alert.id} className="p-3 mobile:p-4 border rounded-lg hover:shadow-sm transition-shadow">
+                  <div className="flex items-start justify-between mb-2 gap-2">
+                    <div className="flex items-center space-x-2 min-w-0 flex-1">
+                      <alert.icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-medium text-sm mobile:text-base truncate">{alert.elderName}</h4>
                         <p className="text-xs text-muted-foreground">{alert.serviceType}</p>
                       </div>
-                      <Badge variant={getRiskBadgeColor(alert.riskLevel)}>{alert.riskLevel}</Badge>
+                      <Badge variant={getRiskBadgeColor(alert.riskLevel)} className="text-xs flex-shrink-0">
+                        {alert.riskLevel}
+                      </Badge>
                     </div>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground flex-shrink-0">
                       {isClient ? formatTimestamp(alert.timestamp) : alert.timestamp}
                     </span>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-3">{alert.transcript}</p>
+                  <p className="text-xs mobile:text-sm text-muted-foreground mb-3 line-clamp-2">{alert.transcript}</p>
                   <div className="flex flex-wrap gap-2">
                     {alert.audioUrl && (
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" className="text-xs">
                         <Volume2 className="h-3 w-3 mr-1" />
                         Play Audio
                       </Button>
                     )}
-                    <Button size="sm" variant="outline">
+                    <Button size="sm" variant="outline" className="text-xs">
                       Mark Safe
                     </Button>
-                    <Button size="sm" variant="destructive">
+                    <Button size="sm" variant="destructive" className="text-xs">
                       Escalate
                     </Button>
                   </div>
