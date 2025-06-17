@@ -113,6 +113,7 @@ export default function Dashboard() {
   const [alerts] = useState<Alert[]>(mockRecentAlerts)
   const [isLoading, setIsLoading] = useState(true)
   const [isClient, setIsClient] = useState(false)
+  const [displayTimestamps, setDisplayTimestamps] = useState<Record<string, string>>({})
   const router = useRouter()
 
   useEffect(() => {
@@ -133,6 +134,28 @@ export default function Dashboard() {
     const timer = setTimeout(() => setIsLoading(false), 500)
     return () => clearTimeout(timer)
   }, [router])
+
+  useEffect(() => {
+    if (!isClient) return
+
+    // Initialize display timestamps with raw timestamps, then format them
+    const timestamps: Record<string, string> = {}
+    alerts.forEach((alert) => {
+      timestamps[alert.id] = alert.timestamp
+    })
+    setDisplayTimestamps(timestamps)
+
+    // Format timestamps after initial render
+    const timer = setTimeout(() => {
+      const formattedTimestamps: Record<string, string> = {}
+      alerts.forEach((alert) => {
+        formattedTimestamps[alert.id] = formatTimestamp(alert.timestamp)
+      })
+      setDisplayTimestamps(formattedTimestamps)
+    }, 0)
+
+    return () => clearTimeout(timer)
+  }, [alerts, isClient])
 
   const getRiskBadgeColor = (level: string) => {
     switch (level) {
@@ -335,7 +358,7 @@ export default function Dashboard() {
                       </Badge>
                     </div>
                     <span className="text-xs text-muted-foreground flex-shrink-0">
-                      {isClient ? formatTimestamp(alert.timestamp) : alert.timestamp}
+                      {displayTimestamps[alert.id] || alert.timestamp}
                     </span>
                   </div>
                   <p className="text-xs mobile:text-sm text-muted-foreground mb-3 line-clamp-2">{alert.transcript}</p>

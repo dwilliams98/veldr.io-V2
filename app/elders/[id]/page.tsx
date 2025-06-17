@@ -59,10 +59,33 @@ export default function ElderDetailPage() {
   const [voiceLogs] = useState(mockVoiceLogs)
   const [playingAudio, setPlayingAudio] = useState<string | null>(null)
   const [isClient, setIsClient] = useState(false)
+  const [displayTimestamps, setDisplayTimestamps] = useState<Record<string, string>>({})
 
   useEffect(() => {
     setIsClient(true)
   }, [])
+
+  useEffect(() => {
+    if (!isClient) return
+
+    // Initialize display timestamps with raw timestamps, then format them
+    const timestamps: Record<string, string> = {}
+    voiceLogs.forEach((log) => {
+      timestamps[log.id] = log.timestamp
+    })
+    setDisplayTimestamps(timestamps)
+
+    // Format timestamps after initial render
+    const timer = setTimeout(() => {
+      const formattedTimestamps: Record<string, string> = {}
+      voiceLogs.forEach((log) => {
+        formattedTimestamps[log.id] = formatTimestamp(log.timestamp)
+      })
+      setDisplayTimestamps(formattedTimestamps)
+    }, 0)
+
+    return () => clearTimeout(timer)
+  }, [voiceLogs, isClient])
 
   const getRiskBadgeColor = (level: string) => {
     switch (level) {
@@ -168,7 +191,7 @@ export default function ElderDetailPage() {
                       <div className="flex items-center space-x-3">
                         <Badge variant={getRiskBadgeColor(log.riskLevel)}>{log.riskLevel}</Badge>
                         <span className="text-xs text-gray-500">
-                          {isClient ? formatTimestamp(log.timestamp) : log.timestamp}
+                          {displayTimestamps[log.id] || log.timestamp}
                         </span>
                         <span className="text-sm text-gray-500">Duration: {log.duration}</span>
                       </div>

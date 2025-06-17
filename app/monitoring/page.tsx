@@ -148,6 +148,7 @@ export default function MonitoringPage() {
   const [alerts] = useState<ServiceAlert[]>(mockRecentAlerts)
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("services")
+  const [displayTimestamps, setDisplayTimestamps] = useState<Record<string, string>>({})
   const router = useRouter()
 
   useEffect(() => {
@@ -162,6 +163,26 @@ export default function MonitoringPage() {
     const timer = setTimeout(() => setIsLoading(false), 500)
     return () => clearTimeout(timer)
   }, [router])
+
+  useEffect(() => {
+    // Initialize display timestamps with raw timestamps, then format them
+    const timestamps: Record<string, string> = {}
+    alerts.forEach((alert) => {
+      timestamps[alert.id] = alert.timestamp
+    })
+    setDisplayTimestamps(timestamps)
+
+    // Format timestamps after initial render
+    const timer = setTimeout(() => {
+      const formattedTimestamps: Record<string, string> = {}
+      alerts.forEach((alert) => {
+        formattedTimestamps[alert.id] = formatTimestamp(alert.timestamp)
+      })
+      setDisplayTimestamps(formattedTimestamps)
+    }, 0)
+
+    return () => clearTimeout(timer)
+  }, [alerts])
 
   const toggleService = (serviceId: string) => {
     setServices((prevServices) =>
@@ -358,7 +379,7 @@ export default function MonitoringPage() {
                         <div className="flex items-center space-x-2">
                           {alert.resolved && <CheckCircle className="h-4 w-4 text-green-600" />}
                           <span className="text-xs text-muted-foreground">
-                            {formatTimestamp(alert.timestamp)}
+                            {displayTimestamps[alert.id] || alert.timestamp}
                           </span>
                         </div>
                       </div>
