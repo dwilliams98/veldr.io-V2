@@ -167,7 +167,6 @@ export default function AlertsPage() {
   const [activeTab, setActiveTab] = useState("all")
   const [isLoading, setIsLoading] = useState(true)
   const [isClient, setIsClient] = useState(false)
-  const [displayTimestamps, setDisplayTimestamps] = useState<Record<string, string>>({})
   const router = useRouter()
 
   useEffect(() => {
@@ -188,17 +187,6 @@ export default function AlertsPage() {
     const timer = setTimeout(() => setIsLoading(false), 500)
     return () => clearTimeout(timer)
   }, [router, isClient])
-
-  useEffect(() => {
-    if (!isClient) return
-
-    // Format timestamps directly when client is ready
-    const formattedTimestamps: Record<string, string> = {}
-    alerts.forEach((alert) => {
-      formattedTimestamps[alert.id] = formatTimestamp(alert.timestamp)
-    })
-    setDisplayTimestamps(formattedTimestamps)
-  }, [alerts, isClient])
 
   useEffect(() => {
     if (!isClient) return
@@ -540,7 +528,7 @@ export default function AlertsPage() {
                             <h3 className="font-semibold text-base mobile:text-lg mb-1 line-clamp-2">{alert.title}</h3>
                             <p className="text-xs mobile:text-sm text-muted-foreground mb-2">
                               <strong>{alert.elderName}</strong> • <span className="text-xs text-muted-foreground">
-                                {displayTimestamps[alert.id] || alert.timestamp}
+                                {formatTimestamp(alert.timestamp)}
                               </span>
                             </p>
                             <p className="text-sm mobile:text-base text-foreground mb-3 line-clamp-2">{alert.description}</p>
