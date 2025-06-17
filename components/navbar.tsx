@@ -18,17 +18,22 @@ import { Shield, Settings, LogOut, User, Menu, X } from "lucide-react"
 
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isClient, setIsClient] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
 
   useEffect(() => {
-    // Check authentication status
-    if (typeof window !== "undefined") {
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    // Check authentication status only on client side
+    if (isClient && typeof window !== "undefined") {
       const token = localStorage.getItem("veldr_token")
       setIsAuthenticated(!!token)
     }
-  }, [pathname])
+  }, [isClient, pathname])
 
   const handleLogout = () => {
     try {
@@ -57,12 +62,12 @@ export default function Navbar() {
   return (
     <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50 safe-top">
       <div className="container mx-auto px-3 mobile:px-4 py-3 mobile:py-4 flex justify-between items-center">
-        <Link href={isAuthenticated ? "/dashboard" : "/"} className="flex items-center space-x-2">
+        <Link href={(isClient && isAuthenticated) ? "/dashboard" : "/"} className="flex items-center space-x-2">
           <Shield className="h-6 w-6 mobile:h-8 mobile:w-8 text-primary" />
           <span className="text-lg mobile:text-2xl font-bold text-primary">Veldr.io</span>
         </Link>
 
-        {isAuthenticated && (
+        {isClient && isAuthenticated && (
           <>
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-4 lg:space-x-6">
