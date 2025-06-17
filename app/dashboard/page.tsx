@@ -138,23 +138,12 @@ export default function Dashboard() {
   useEffect(() => {
     if (!isClient) return
 
-    // Initialize display timestamps with raw timestamps, then format them
-    const timestamps: Record<string, string> = {}
+    // Format timestamps directly when client is ready
+    const formattedTimestamps: Record<string, string> = {}
     alerts.forEach((alert) => {
-      timestamps[alert.id] = alert.timestamp
+      formattedTimestamps[alert.id] = formatTimestamp(alert.timestamp)
     })
-    setDisplayTimestamps(timestamps)
-
-    // Format timestamps after initial render
-    const timer = setTimeout(() => {
-      const formattedTimestamps: Record<string, string> = {}
-      alerts.forEach((alert) => {
-        formattedTimestamps[alert.id] = formatTimestamp(alert.timestamp)
-      })
-      setDisplayTimestamps(formattedTimestamps)
-    }, 0)
-
-    return () => clearTimeout(timer)
+    setDisplayTimestamps(formattedTimestamps)
   }, [alerts, isClient])
 
   const getRiskBadgeColor = (level: string) => {
