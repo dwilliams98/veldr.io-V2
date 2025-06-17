@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AlertTriangle, Phone, Mail, Calendar, Play, Pause, Settings } from "lucide-react"
+import { format } from "date-fns"
 import Navbar from "@/components/navbar"
 
 // Mock data - in real app, fetch from GET /api/elders/:elderId and /api/voice-logs/:elderId
@@ -102,14 +103,8 @@ export default function ElderDetailPage() {
 
   const formatTimestamp = (timestamp: string) => {
     try {
-      return new Date(timestamp).toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      })
+      const date = new Date(timestamp)
+      return format(date, 'MMM dd, yyyy HH:mm')
     } catch (error) {
       console.error("Error formatting timestamp:", error)
       return "Invalid date"

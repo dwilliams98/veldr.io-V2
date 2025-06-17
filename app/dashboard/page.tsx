@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { AlertTriangle, Shield, Users, Plus, Phone, Clock, Volume2, Mail, CreditCard } from "lucide-react"
+import { format } from "date-fns"
 import Link from "next/link"
 import Navbar from "@/components/navbar"
 
@@ -161,14 +162,8 @@ export default function Dashboard() {
 
   const formatTimestamp = (timestamp: string) => {
     try {
-      return new Date(timestamp).toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      })
+      const date = new Date(timestamp)
+      return format(date, 'MMM dd, yyyy HH:mm')
     } catch (error) {
       console.error("Error formatting timestamp:", error)
       return "Invalid date"

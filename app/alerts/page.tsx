@@ -27,6 +27,7 @@ import {
   Archive,
   Flag,
 } from "lucide-react"
+import { format } from "date-fns"
 import Navbar from "@/components/navbar"
 
 // Type definitions for Alert management
@@ -285,15 +286,7 @@ export default function AlertsPage() {
   const formatTimestamp = (timestamp: string): string => {
     try {
       const date = new Date(timestamp)
-      const options: Intl.DateTimeFormatOptions = {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        hour12: false
-      }
-      return date.toLocaleString('en-US', options)
+      return format(date, 'MMM dd, yyyy HH:mm')
     } catch (error) {
       console.error("Error formatting timestamp:", error)
       return "Invalid date"
