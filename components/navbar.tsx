@@ -25,15 +25,12 @@ export default function Navbar() {
 
   useEffect(() => {
     setIsClient(true)
-  }, [])
-
-  useEffect(() => {
     // Check authentication status only on client side
-    if (isClient && typeof window !== "undefined") {
+    if (typeof window !== "undefined") {
       const token = localStorage.getItem("veldr_token")
       setIsAuthenticated(!!token)
     }
-  }, [isClient, pathname])
+  }, [])
 
   const handleLogout = () => {
     try {
@@ -59,15 +56,38 @@ export default function Navbar() {
     setIsMobileMenuOpen(false)
   }
 
+  // Show loading state or unauthenticated state until client-side hydration is complete
+  if (!isClient) {
+    return (
+      <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50 safe-top">
+        <div className="container mx-auto px-3 mobile:px-4 py-3 mobile:py-4 flex justify-between items-center">
+          <Link href="/" className="flex items-center space-x-2">
+            <Shield className="h-6 w-6 mobile:h-8 mobile:w-8 text-primary" />
+            <span className="text-lg mobile:text-2xl font-bold text-primary">Veldr.io</span>
+          </Link>
+          
+          <div className="flex items-center space-x-2">
+            <Button variant="ghost" size="sm">
+              Login
+            </Button>
+            <Button size="sm">
+              Get Started
+            </Button>
+          </div>
+        </div>
+      </header>
+    )
+  }
+
   return (
     <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50 safe-top">
       <div className="container mx-auto px-3 mobile:px-4 py-3 mobile:py-4 flex justify-between items-center">
-        <Link href={(isClient && isAuthenticated) ? "/dashboard" : "/"} className="flex items-center space-x-2">
+        <Link href={isAuthenticated ? "/dashboard" : "/"} className="flex items-center space-x-2">
           <Shield className="h-6 w-6 mobile:h-8 mobile:w-8 text-primary" />
           <span className="text-lg mobile:text-2xl font-bold text-primary">Veldr.io</span>
         </Link>
 
-        {isClient && isAuthenticated && (
+        {isAuthenticated ? (
           <>
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-4 lg:space-x-6">
@@ -192,6 +212,15 @@ export default function Navbar() {
               </DropdownMenu>
             </div>
           </>
+        ) : (
+          <div className="flex items-center space-x-2">
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/login">Login</Link>
+            </Button>
+            <Button size="sm" asChild>
+              <Link href="/register">Get Started</Link>
+            </Button>
+          </div>
         )}
       </div>
     </header>
