@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Shield, Settings, LogOut, User, Menu, X } from "lucide-react"
+import { Shield, Settings, LogOut, User, Menu, HelpCircle } from "lucide-react"
 
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -50,6 +50,7 @@ export default function Navbar() {
     { href: "/monitoring", label: "Monitoring" },
     { href: "/elders", label: "Elders" },
     { href: "/alerts", label: "Alerts" },
+    { href: "/support", label: "Support" },
   ]
 
   const handleNavClick = () => {
@@ -160,6 +161,10 @@ export default function Navbar() {
                           <Settings className="mr-2 h-4 w-4" />
                           Settings
                         </Button>
+                        <Button variant="ghost" className="w-full justify-start" size="sm">
+                          <HelpCircle className="mr-2 h-4 w-4" />
+                          Support
+                        </Button>
                         <Button 
                           variant="ghost" 
                           className="w-full justify-start text-red-600 hover:text-red-600 hover:bg-red-50" 
@@ -202,6 +207,12 @@ export default function Navbar() {
                   <DropdownMenuItem>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/support">
+                      <HelpCircle className="mr-2 h-4 w-4" />
+                      <span>Support</span>
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
