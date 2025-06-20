@@ -8,10 +8,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { AlertTriangle, Shield, Users, Plus, Phone, Clock, Volume2, Mail, CreditCard } from "lucide-react"
+import { AlertTriangle, Shield, Users, Plus, Phone, Clock, Volume2, Mail, CreditCard, MessageCircle } from "lucide-react"
 import { format } from "date-fns"
 import Link from "next/link"
 import Navbar from "@/components/navbar"
+import VoiceAssistant from "@/components/voice-assistant"
 
 // Service interfaces for type safety
 interface MonitoringService {
@@ -113,13 +114,10 @@ export default function Dashboard() {
   const [elders] = useState<Elder[]>(mockElders)
   const [alerts] = useState<Alert[]>(mockRecentAlerts)
   const [isLoading, setIsLoading] = useState(true)
-  const [isClient, setIsClient] = useState(false)
+  const [activeTab, setActiveTab] = useState("overview")
   const [displayTimestamps, setDisplayTimestamps] = useState<Record<string, string>>({})
+  const [showVoiceAssistant, setShowVoiceAssistant] = useState(false)
   const router = useRouter()
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
 
   useEffect(() => {
     // Check authentication
@@ -137,15 +135,24 @@ export default function Dashboard() {
   }, [router])
 
   useEffect(() => {
-    if (!isClient) return
-
-    // Format timestamps directly when client is ready
-    const formattedTimestamps: Record<string, string> = {}
+    // Initialize display timestamps with raw timestamps, then format them
+    const timestamps: Record<string, string> = {}
     alerts.forEach((alert) => {
-      formattedTimestamps[alert.id] = formatTimestamp(alert.timestamp)
+      timestamps[alert.id] = alert.timestamp
     })
-    setDisplayTimestamps(formattedTimestamps)
-  }, [alerts, isClient])
+    setDisplayTimestamps(timestamps)
+
+    // Format timestamps after initial render
+    const timer = setTimeout(() => {
+      const formattedTimestamps: Record<string, string> = {}
+      alerts.forEach((alert) => {
+        formattedTimestamps[alert.id] = formatTimestamp(alert.timestamp)
+      })
+      setDisplayTimestamps(formattedTimestamps)
+    }, 0)
+
+    return () => clearTimeout(timer)
+  }, [alerts])
 
   const getRiskBadgeColor = (level: string) => {
     switch (level) {
@@ -167,6 +174,25 @@ export default function Dashboard() {
     } catch (error) {
       console.error("Error formatting timestamp:", error)
       return "Invalid date"
+    }
+  }
+
+  const handleVoiceIntentDetected = (intent: string) => {
+    // Handle different intents from voice assistant
+    switch (intent) {
+      case 'fraud_alert':
+        // Navigate to alerts page
+        router.push('/alerts')
+        break
+      case 'support':
+        // Navigate to support page
+        router.push('/support')
+        break
+      case 'emergency':
+        // Show emergency modal or redirect
+        alert('Emergency detected! Redirecting to emergency support...')
+        router.push('/support')
+        break
     }
   }
 
@@ -192,178 +218,204 @@ export default function Dashboard() {
             <h1 className="text-2xl mobile:text-3xl font-bold text-foreground">Dashboard</h1>
             <p className="text-sm mobile:text-base text-muted-foreground">Monitor and protect your loved ones</p>
           </div>
-          <Link href="/elders/new">
-            <Button className="w-full sm:w-auto">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Elder
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => setShowVoiceAssistant(!showVoiceAssistant)}
+              className="w-full sm:w-auto"
+            >
+              <MessageCircle className="h-4 w-4 mr-2" />
+              {showVoiceAssistant ? 'Hide' : 'Show'} AI Assistant
             </Button>
-          </Link>
+            <Link href="/elders/new">
+              <Button className="w-full sm:w-auto">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Elder
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 mobile-lg:grid-cols-2 lg:grid-cols-3 gap-4 mobile:gap-6 mb-6 mobile:mb-8">
-          <Card className="hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Protected Elders</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{elders.length}</div>
-              <p className="text-xs text-muted-foreground">Active monitoring</p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+          {/* Main Content */}
+          <div className={`${showVoiceAssistant ? 'xl:col-span-3' : 'xl:col-span-4'} space-y-6`}>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 mobile-lg:grid-cols-2 lg:grid-cols-3 gap-4 mobile:gap-6">
+              <Card className="hover:shadow-md transition-shadow">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Protected Elders</CardTitle>
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{elders.length}</div>
+                  <p className="text-xs text-muted-foreground">Active monitoring</p>
+                </CardContent>
+              </Card>
 
-          <Card className="hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Recent Alerts</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{alerts.length}</div>
-              <p className="text-xs text-muted-foreground">Last 24 hours</p>
-            </CardContent>
-          </Card>
+              <Card className="hover:shadow-md transition-shadow">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Recent Alerts</CardTitle>
+                  <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{alerts.length}</div>
+                  <p className="text-xs text-muted-foreground">Last 24 hours</p>
+                </CardContent>
+              </Card>
 
-          <Card className="hover:shadow-md transition-shadow mobile-lg:col-span-2 lg:col-span-1">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Protection Status</CardTitle>
-              <Shield className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">Active</div>
-              <p className="text-xs text-muted-foreground">All systems operational</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Service Monitoring Overview */}
-        <Card className="mb-6 mobile:mb-8 hover:shadow-md transition-shadow">
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <CardTitle className="text-lg mobile:text-xl">Service Monitoring</CardTitle>
-                <CardDescription className="text-sm mobile:text-base">Connected protection services across all platforms</CardDescription>
-              </div>
-              <Link href="/monitoring">
-                <Button variant="outline" className="w-full sm:w-auto">Manage Services</Button>
-              </Link>
+              <Card className="hover:shadow-md transition-shadow mobile-lg:col-span-2 lg:col-span-1">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Protection Status</CardTitle>
+                  <Shield className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">Active</div>
+                  <p className="text-xs text-muted-foreground">All systems operational</p>
+                </CardContent>
+              </Card>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 mobile-lg:grid-cols-3 lg:grid-cols-5 gap-3 mobile:gap-4">
-              {mockServices.map((service, index) => (
-                <div key={`service-${index}`} className="text-center p-3 mobile:p-4 border rounded-lg hover:shadow-sm transition-shadow">
-                  <service.icon className={`h-6 w-6 mobile:h-8 mobile:w-8 mx-auto mb-2 ${service.color}`} />
-                  <h3 className="font-medium text-xs mobile:text-sm leading-tight">{service.name}</h3>
-                  <p className={`text-xs mt-1 ${service.status === "Active" ? "text-green-600" : "text-muted-foreground"}`}>
-                    {service.status}
-                  </p>
-                  {service.alerts > 0 && (
-                    <Badge variant="destructive" className="mt-1 text-xs">
-                      {service.alerts} alerts
-                    </Badge>
-                  )}
+
+            {/* Service Monitoring Overview */}
+            <Card className="hover:shadow-md transition-shadow">
+              <CardHeader>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div>
+                    <CardTitle className="text-lg mobile:text-xl">Service Monitoring</CardTitle>
+                    <CardDescription className="text-sm mobile:text-base">Connected protection services across all platforms</CardDescription>
+                  </div>
+                  <Link href="/monitoring">
+                    <Button variant="outline" className="w-full sm:w-auto">Manage Services</Button>
+                  </Link>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mobile:gap-8">
-          {/* Elder Profiles */}
-          <Card className="hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-lg mobile:text-xl">Protected Elders</CardTitle>
-              <CardDescription className="text-sm mobile:text-base">Manage your loved ones&apos; protection settings</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {elders.map((elder) => (
-                <div key={elder.id} className="flex items-center justify-between p-3 mobile:p-4 border rounded-lg hover:shadow-sm transition-shadow">
-                  <div className="flex items-center space-x-3 mobile:space-x-4 min-w-0 flex-1">
-                    <Avatar className="h-10 w-10 mobile:h-12 mobile:w-12 flex-shrink-0">
-                      <AvatarImage src={elder.photoURL || "/placeholder.svg"} alt={elder.name} />
-                      <AvatarFallback>
-                        {elder.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-medium text-sm mobile:text-base truncate">{elder.name}</h3>
-                      <p className="text-xs mobile:text-sm text-muted-foreground">
-                        {elder.relationship} • Age {elder.age}
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 mobile-lg:grid-cols-3 lg:grid-cols-5 gap-3 mobile:gap-4">
+                  {mockServices.map((service, index) => (
+                    <div key={`service-${index}`} className="text-center p-3 mobile:p-4 border rounded-lg hover:shadow-sm transition-shadow">
+                      <service.icon className={`h-6 w-6 mobile:h-8 mobile:w-8 mx-auto mb-2 ${service.color}`} />
+                      <h3 className="font-medium text-xs mobile:text-sm leading-tight">{service.name}</h3>
+                      <p className={`text-xs mt-1 ${service.status === "Active" ? "text-green-600" : "text-muted-foreground"}`}>
+                        {service.status}
                       </p>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <Phone className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                        <span className="text-xs text-muted-foreground truncate">{elder.phoneNumber}</span>
-                      </div>
+                      {service.alerts > 0 && (
+                        <Badge variant="destructive" className="mt-1 text-xs">
+                          {service.alerts} alerts
+                        </Badge>
+                      )}
                     </div>
-                  </div>
-                  <div className="text-right flex-shrink-0 ml-2">
-                    {elder.recentAlerts > 0 && (
-                      <Badge variant="destructive" className="mb-2 text-xs">
-                        {elder.recentAlerts} alerts
-                      </Badge>
-                    )}
-                    <p className="text-xs text-muted-foreground mb-2">
-                      <Clock className="h-3 w-3 inline mr-1" />
-                      {elder.lastActivity}
-                    </p>
-                    <Link href={`/elders/${elder.id}`}>
-                      <Button variant="outline" size="sm" className="text-xs">
-                        View Details
-                      </Button>
-                    </Link>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Recent Alerts */}
-          <Card className="hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-lg mobile:text-xl">Recent Alerts</CardTitle>
-              <CardDescription className="text-sm mobile:text-base">Latest fraud detection activities</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {alerts.map((alert) => (
-                <div key={alert.id} className="p-3 mobile:p-4 border rounded-lg hover:shadow-sm transition-shadow">
-                  <div className="flex items-start justify-between mb-2 gap-2">
-                    <div className="flex items-center space-x-2 min-w-0 flex-1">
-                      <alert.icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <h4 className="font-medium text-sm mobile:text-base truncate">{alert.elderName}</h4>
-                        <p className="text-xs text-muted-foreground">{alert.serviceType}</p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mobile:gap-8">
+              {/* Elder Profiles */}
+              <Card className="hover:shadow-md transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg mobile:text-xl">Protected Elders</CardTitle>
+                  <CardDescription className="text-sm mobile:text-base">Manage your loved ones&apos; protection settings</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {elders.map((elder) => (
+                    <div key={elder.id} className="flex items-center justify-between p-3 mobile:p-4 border rounded-lg hover:shadow-sm transition-shadow">
+                      <div className="flex items-center space-x-3 mobile:space-x-4 min-w-0 flex-1">
+                        <Avatar className="h-10 w-10 mobile:h-12 mobile:w-12 flex-shrink-0">
+                          <AvatarImage src={elder.photoURL || "/placeholder.svg"} alt={elder.name} />
+                          <AvatarFallback>
+                            {elder.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-medium text-sm mobile:text-base truncate">{elder.name}</h3>
+                          <p className="text-xs mobile:text-sm text-muted-foreground">
+                            {elder.relationship} • Age {elder.age}
+                          </p>
+                          <div className="flex items-center space-x-2 mt-1">
+                            <Phone className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                            <span className="text-xs text-muted-foreground truncate">{elder.phoneNumber}</span>
+                          </div>
+                        </div>
                       </div>
-                      <Badge variant={getRiskBadgeColor(alert.riskLevel)} className="text-xs flex-shrink-0">
-                        {alert.riskLevel}
-                      </Badge>
+                      <div className="text-right flex-shrink-0 ml-2">
+                        {elder.recentAlerts > 0 && (
+                          <Badge variant="destructive" className="mb-2 text-xs">
+                            {elder.recentAlerts} alerts
+                          </Badge>
+                        )}
+                        <p className="text-xs text-muted-foreground mb-2">
+                          <Clock className="h-3 w-3 inline mr-1" />
+                          {elder.lastActivity}
+                        </p>
+                        <Link href={`/elders/${elder.id}`}>
+                          <Button variant="outline" size="sm" className="text-xs">
+                            View Details
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
-                    <span className="text-xs text-muted-foreground flex-shrink-0">
-                      {displayTimestamps[alert.id] || alert.timestamp}
-                    </span>
-                  </div>
-                  <p className="text-xs mobile:text-sm text-muted-foreground mb-3 line-clamp-2">{alert.transcript}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {alert.audioUrl && (
-                      <Button size="sm" variant="outline" className="text-xs">
-                        <Volume2 className="h-3 w-3 mr-1" />
-                        Play Audio
-                      </Button>
-                    )}
-                    <Button size="sm" variant="outline" className="text-xs">
-                      Mark Safe
-                    </Button>
-                    <Button size="sm" variant="destructive" className="text-xs">
-                      Escalate
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Recent Alerts */}
+              <Card className="hover:shadow-md transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg mobile:text-xl">Recent Alerts</CardTitle>
+                  <CardDescription className="text-sm mobile:text-base">Latest fraud detection activities</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {alerts.map((alert) => (
+                    <div key={alert.id} className="p-3 mobile:p-4 border rounded-lg hover:shadow-sm transition-shadow">
+                      <div className="flex items-start justify-between mb-2 gap-2">
+                        <div className="flex items-center space-x-2 min-w-0 flex-1">
+                          <alert.icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-medium text-sm mobile:text-base truncate">{alert.elderName}</h4>
+                            <p className="text-xs text-muted-foreground">{alert.serviceType}</p>
+                          </div>
+                          <Badge variant={getRiskBadgeColor(alert.riskLevel)} className="text-xs flex-shrink-0">
+                            {alert.riskLevel}
+                          </Badge>
+                        </div>
+                        <span className="text-xs text-muted-foreground flex-shrink-0">
+                          {displayTimestamps[alert.id] || alert.timestamp}
+                        </span>
+                      </div>
+                      <p className="text-xs mobile:text-sm text-muted-foreground mb-3 line-clamp-2">{alert.transcript}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {alert.audioUrl && (
+                          <Button size="sm" variant="outline" className="text-xs">
+                            <Volume2 className="h-3 w-3 mr-1" />
+                            Play Audio
+                          </Button>
+                        )}
+                        <Button size="sm" variant="outline" className="text-xs">
+                          Mark Safe
+                        </Button>
+                        <Button size="sm" variant="destructive" className="text-xs">
+                          Escalate
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Voice Assistant Sidebar */}
+          {showVoiceAssistant && (
+            <div className="xl:col-span-1">
+              <VoiceAssistant
+                userType="caregiver"
+                onIntentDetected={handleVoiceIntentDetected}
+                className="h-[800px] sticky top-4"
+              />
+            </div>
+          )}
         </div>
       </main>
     </div>
