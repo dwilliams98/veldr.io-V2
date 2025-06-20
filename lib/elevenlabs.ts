@@ -1,7 +1,7 @@
-import { ElevenLabsApi } from 'elevenlabs'
+import { ElevenLabsClient } from 'elevenlabs'
 
 // ElevenLabs configuration
-const elevenlabs = new ElevenLabsApi({
+const elevenlabs = new ElevenLabsClient({
   apiKey: process.env.ELEVENLABS_API_KEY || '',
 })
 
