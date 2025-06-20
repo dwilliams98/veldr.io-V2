@@ -1,4 +1,4 @@
-import { ElevenLabs } from 'elevenlabs'
+import ElevenLabs from 'elevenlabs'
 
 // ElevenLabs configuration
 const config = {
