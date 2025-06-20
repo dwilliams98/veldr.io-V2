@@ -28,35 +28,47 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate AI response
-    const aiResponse = await generateAIResponse(message, context)
+    let aiResponse: string
+    try {
+      aiResponse = await generateAIResponse(message, context)
+    } catch (error) {
+      console.error('AI response generation failed:', error)
+      // Provide a helpful fallback response
+      aiResponse = "I apologize, but I'm experiencing technical difficulties right now. Please try again in a moment, or contact our support team if you need immediate assistance."
+    }
 
     // Generate audio if requested
     let audioData = null
     if (generateAudio) {
       try {
-        // Select appropriate voice based on context
-        let voiceId = VOICE_IDS.CUSTOMER_SUPPORT
-        let settings = VOICE_SETTINGS.CONVERSATIONAL
+        // Check if ElevenLabs API key is configured
+        if (!process.env.ELEVENLABS_API_KEY) {
+          console.warn('ELEVENLABS_API_KEY is not configured - skipping audio generation')
+        } else {
+          // Select appropriate voice based on context
+          let voiceId = VOICE_IDS.CUSTOMER_SUPPORT
+          let settings = VOICE_SETTINGS.CONVERSATIONAL
 
-        if (userType === 'elder') {
-          voiceId = VOICE_IDS.ELDER_SUPPORT
-          settings = VOICE_SETTINGS.CALM
-        }
+          if (userType === 'elder') {
+            voiceId = VOICE_IDS.ELDER_SUPPORT
+            settings = VOICE_SETTINGS.CALM
+          }
 
-        if (intent === 'fraud_alert' || intent === 'emergency') {
-          voiceId = VOICE_IDS.FRAUD_ALERT
-          settings = VOICE_SETTINGS.ALERT
-        }
+          if (intent === 'fraud_alert' || intent === 'emergency') {
+            voiceId = VOICE_IDS.FRAUD_ALERT
+            settings = VOICE_SETTINGS.ALERT
+          }
 
-        const audioBuffer = await generateSpeech({
-          text: aiResponse,
-          voiceId,
-          settings,
-        })
+          const audioBuffer = await generateSpeech({
+            text: aiResponse,
+            voiceId,
+            settings,
+          })
 
-        audioData = {
-          audio: audioBuffer.toString('base64'),
-          mimeType: 'audio/mpeg',
+          audioData = {
+            audio: audioBuffer.toString('base64'),
+            mimeType: 'audio/mpeg',
+          }
         }
       } catch (audioError) {
         console.error('Audio generation failed:', audioError)
@@ -88,9 +100,27 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Conversation API error:', error)
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to process conversation'
+    let statusCode = 500
+    
+    if (error instanceof Error) {
+      if (error.message.includes('API key')) {
+        errorMessage = 'Service configuration error. Please contact support.'
+        statusCode = 503
+      } else if (error.message.includes('rate limit')) {
+        errorMessage = 'Service temporarily busy. Please try again in a moment.'
+        statusCode = 429
+      } else if (error.message.includes('network') || error.message.includes('connection')) {
+        errorMessage = 'Service temporarily unavailable. Please try again later.'
+        statusCode = 503
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to process conversation' },
-      { status: 500 }
+      { error: errorMessage },
+      { status: statusCode }
     )
   }
 }

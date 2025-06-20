@@ -61,10 +61,38 @@ Key guidelines:
 Your goal is to immediately protect the user from ongoing fraud attempts.`,
 }
 
+function getFallbackResponse(context: ConversationContext, message: string): string {
+  const responses = {
+    elder: {
+      fraud_alert: "I understand you may be concerned about a potential scam. For your safety, please hang up any suspicious calls immediately and contact your family or local authorities if you feel threatened. I'm here to help you stay safe.",
+      emergency: "If this is an emergency, please call 911 immediately. If you need help with Veldr or have concerns about fraud, I'm here to assist you.",
+      support: "I'm here to help you with any questions about staying safe from scams. While I'm having trouble connecting to my main system right now, I can still provide basic safety guidance.",
+      general_inquiry: "Hello! I'm Veldr, your safety assistant. While I'm having some technical difficulties right now, I'm still here to help keep you safe from scams and answer basic questions."
+    },
+    caregiver: {
+      fraud_alert: "I understand you're concerned about a potential fraud attempt involving your loved one. Please ensure they're safe and consider contacting authorities if there's an immediate threat. I'll help you document this incident once my systems are fully operational.",
+      emergency: "If this is an emergency involving your loved one, please call 911 immediately. For Veldr-related urgent matters, please contact our support team directly.",
+      support: "I'm here to help you protect your loved ones. While I'm experiencing some technical difficulties connecting to my main systems, I can still provide basic guidance about fraud protection.",
+      general_inquiry: "Hello! I'm here to help you protect your elderly loved ones from fraud. I'm currently experiencing some technical difficulties, but I can still provide basic assistance and safety tips."
+    }
+  }
+
+  const userType = context.userType === 'support' ? 'caregiver' : context.userType
+  const intent = context.intent || 'general_inquiry'
+  
+  return responses[userType][intent] || responses[userType].general_inquiry
+}
+
 export async function generateAIResponse(
   message: string,
   context: ConversationContext
 ): Promise<string> {
+  // Check if API key is configured
+  if (!process.env.GROQ_API_KEY) {
+    console.error('GROQ_API_KEY is not configured')
+    return getFallbackResponse(context, message) + "\n\nNote: AI services are currently unavailable due to configuration issues. Please contact support for assistance."
+  }
+
   try {
     const systemPrompt = getSystemPrompt(context)
     
@@ -86,10 +114,28 @@ export async function generateAIResponse(
       stream: false,
     })
 
-    return completion.choices[0]?.message?.content || 'I apologize, but I cannot process your request right now. Please try again or contact support.'
+    return completion.choices[0]?.message?.content || getFallbackResponse(context, message)
   } catch (error) {
     console.error('Groq API error:', error)
-    throw new Error('Failed to generate AI response')
+    
+    // Provide helpful error messages based on error type
+    if (error instanceof Error) {
+      if (error.message.includes('401') || error.message.includes('authentication')) {
+        console.error('Authentication failed - check GROQ_API_KEY')
+        return getFallbackResponse(context, message) + "\n\nNote: AI services are temporarily unavailable due to authentication issues."
+      }
+      if (error.message.includes('rate limit') || error.message.includes('429')) {
+        console.error('Rate limit exceeded')
+        return getFallbackResponse(context, message) + "\n\nNote: AI services are temporarily busy. Please try again in a moment."
+      }
+      if (error.message.includes('Connection error') || error.message.includes('socket hang up')) {
+        console.error('Network connection failed')
+        return getFallbackResponse(context, message) + "\n\nNote: AI services are temporarily unavailable due to network issues."
+      }
+    }
+    
+    // Generic fallback for any other errors
+    return getFallbackResponse(context, message) + "\n\nNote: AI services are temporarily unavailable. Please try again later."
   }
 }
 
@@ -110,6 +156,12 @@ function getSystemPrompt(context: ConversationContext): string {
 }
 
 export async function detectIntent(message: string): Promise<ConversationContext['intent']> {
+  // Check if API key is configured
+  if (!process.env.GROQ_API_KEY) {
+    console.error('GROQ_API_KEY is not configured for intent detection')
+    return detectIntentFallback(message)
+  }
+
   try {
     const completion = await groq.chat.completions.create({
       model: 'llama-3.1-8b-instant',
@@ -136,9 +188,32 @@ export async function detectIntent(message: string): Promise<ConversationContext
       return intent as ConversationContext['intent']
     }
     
-    return 'general_inquiry'
+    return detectIntentFallback(message)
   } catch (error) {
     console.error('Intent detection error:', error)
-    return 'general_inquiry'
+    return detectIntentFallback(message)
   }
+}
+
+function detectIntentFallback(message: string): ConversationContext['intent'] {
+  const lowerMessage = message.toLowerCase()
+  
+  // Simple keyword-based intent detection as fallback
+  const fraudKeywords = ['scam', 'fraud', 'suspicious', 'phishing', 'fake', 'steal', 'money', 'bank', 'credit card', 'social security']
+  const emergencyKeywords = ['emergency', 'help', 'urgent', 'danger', 'threat', 'police', '911']
+  const supportKeywords = ['help', 'support', 'how', 'veldr', 'account', 'settings', 'problem']
+  
+  if (fraudKeywords.some(keyword => lowerMessage.includes(keyword))) {
+    return 'fraud_alert'
+  }
+  
+  if (emergencyKeywords.some(keyword => lowerMessage.includes(keyword))) {
+    return 'emergency'
+  }
+  
+  if (supportKeywords.some(keyword => lowerMessage.includes(keyword))) {
+    return 'support'
+  }
+  
+  return 'general_inquiry'
 }

@@ -16,7 +16,8 @@ import {
   AlertTriangle,
   Phone,
   MessageCircle,
-  Loader2
+  Loader2,
+  WifiOff
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -27,6 +28,7 @@ interface Message {
   timestamp: string
   intent?: string
   audioUrl?: string
+  isError?: boolean
 }
 
 interface VoiceAssistantProps {
@@ -52,6 +54,7 @@ export default function VoiceAssistant({
   const [isLoading, setIsLoading] = useState(false)
   const [audioEnabled, setAudioEnabled] = useState(true)
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null)
+  const [connectionError, setConnectionError] = useState(false)
 
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -147,6 +150,7 @@ export default function VoiceAssistant({
     setMessages(prev => [...prev, userMessage])
     setInputText('')
     setIsLoading(true)
+    setConnectionError(false)
 
     try {
       const response = await fetch('/api/voice/conversation', {
@@ -165,7 +169,10 @@ export default function VoiceAssistant({
         }),
       })
 
-      if (!response.ok) throw new Error('Failed to get response')
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+        throw new Error(errorData.error || `HTTP ${response.status}`)
+      }
 
       const data = await response.json()
 
@@ -191,11 +198,26 @@ export default function VoiceAssistant({
       }
     } catch (error) {
       console.error('Error sending message:', error)
+      setConnectionError(true)
+      
+      let errorContent = 'I apologize, but I encountered an error. Please try again or contact support if the issue persists.'
+      
+      if (error instanceof Error) {
+        if (error.message.includes('503') || error.message.includes('configuration')) {
+          errorContent = 'Our AI services are currently being configured. Please try again in a few minutes or contact support for assistance.'
+        } else if (error.message.includes('429') || error.message.includes('busy')) {
+          errorContent = 'Our services are currently busy. Please wait a moment and try again.'
+        } else if (error.message.includes('Failed to fetch') || error.message.includes('network')) {
+          errorContent = 'There seems to be a connection issue. Please check your internet connection and try again.'
+        }
+      }
+      
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'I apologize, but I encountered an error. Please try again or contact support if the issue persists.',
+        content: errorContent,
         timestamp: new Date().toISOString(),
+        isError: true,
       }
       setMessages(prev => [...prev, errorMessage])
     } finally {
@@ -223,9 +245,13 @@ export default function VoiceAssistant({
     }
   }
 
-  const getMessageIcon = (role: string, intent?: string) => {
+  const getMessageIcon = (role: string, intent?: string, isError?: boolean) => {
     if (role === 'user') {
       return <User className="h-4 w-4" />
+    }
+    
+    if (isError) {
+      return <WifiOff className="h-4 w-4 text-orange-500" />
     }
     
     switch (intent) {
@@ -246,6 +272,9 @@ export default function VoiceAssistant({
           <div className="flex items-center space-x-2">
             <MessageCircle className="h-5 w-5 text-primary" />
             <CardTitle className="text-lg">Veldr Assistant</CardTitle>
+            {connectionError && (
+              <WifiOff className="h-4 w-4 text-orange-500" title="Connection issues detected" />
+            )}
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -285,8 +314,11 @@ export default function VoiceAssistant({
               )}
             >
               {message.role === 'assistant' && (
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  {getMessageIcon(message.role, message.intent)}
+                <div className={cn(
+                  "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
+                  message.isError ? "bg-orange-100" : "bg-primary/10"
+                )}>
+                  {getMessageIcon(message.role, message.intent, message.isError)}
                 </div>
               )}
               
@@ -295,6 +327,8 @@ export default function VoiceAssistant({
                   "max-w-[80%] rounded-lg px-3 py-2",
                   message.role === 'user'
                     ? "bg-primary text-primary-foreground"
+                    : message.isError
+                    ? "bg-orange-50 border border-orange-200"
                     : "bg-muted"
                 )}
               >
@@ -311,7 +345,12 @@ export default function VoiceAssistant({
                     </Button>
                   )}
                 </div>
-                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                <p className={cn(
+                  "text-sm whitespace-pre-wrap",
+                  message.isError && "text-orange-800"
+                )}>
+                  {message.content}
+                </p>
                 <p className="text-xs opacity-70 mt-1">
                   {new Date(message.timestamp).toLocaleTimeString()}
                 </p>
