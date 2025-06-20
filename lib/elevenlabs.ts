@@ -1,11 +1,11 @@
-import { ElevenLabsApi, ElevenLabsApiConfig } from 'elevenlabs'
+import { ElevenLabs } from 'elevenlabs'
 
 // ElevenLabs configuration
-const config: ElevenLabsApiConfig = {
+const config = {
   apiKey: process.env.ELEVENLABS_API_KEY || '',
 }
 
-export const elevenlabs = new ElevenLabsApi(config)
+export const elevenlabs = new ElevenLabs(config)
 
 // Voice IDs for different use cases
 export const VOICE_IDS = {
