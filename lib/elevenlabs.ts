@@ -1,18 +1,23 @@
-// Mock ElevenLabs integration for development
-// In production, you would use the actual ElevenLabs SDK
+import { ElevenLabsApi } from 'elevenlabs'
 
+// ElevenLabs configuration
+const elevenlabs = new ElevenLabsApi({
+  apiKey: process.env.ELEVENLABS_API_KEY || '',
+})
+
+// Voice IDs for different use cases
 export const VOICE_IDS = {
   // Professional, calm voice for elder assistance
-  ELDER_SUPPORT: 'pNInz6obpgDQGcFmaJgB', // Adam
+  ELDER_SUPPORT: process.env.ELEVENLABS_ELDER_VOICE_ID || 'pNInz6obpgDQGcFmaJgB', // Adam
   
   // Warm, friendly voice for customer support
-  CUSTOMER_SUPPORT: 'EXAVITQu4vr4xnSDxMaL', // Bella
+  CUSTOMER_SUPPORT: process.env.ELEVENLABS_CUSTOMER_VOICE_ID || 'EXAVITQu4vr4xnSDxMaL', // Bella
   
   // Alert voice for fraud warnings
-  FRAUD_ALERT: 'VR6AewLTigWG4xSOukaG', // Arnold
+  FRAUD_ALERT: process.env.ELEVENLABS_ALERT_VOICE_ID || 'VR6AewLTigWG4xSOukaG', // Arnold
   
   // Gentle voice for notifications
-  NOTIFICATION: 'pqHfZKP75CvOlQylNhV4', // Bill
+  NOTIFICATION: process.env.ELEVENLABS_NOTIFICATION_VOICE_ID || 'pqHfZKP75CvOlQylNhV4', // Bill
 }
 
 // Voice settings for different scenarios
@@ -53,12 +58,20 @@ export async function generateSpeech(options: VoiceGenerationOptions): Promise<B
   } = options
 
   try {
-    // Mock implementation - returns a small audio buffer
-    // In production, this would call the actual ElevenLabs API
-    console.log(`Mock: Generating speech for text: "${text}" with voice: ${voiceId}`)
+    const audio = await elevenlabs.generate({
+      voice: voiceId,
+      text,
+      model_id: model,
+      voice_settings: settings,
+    })
+
+    // Convert the audio stream to a buffer
+    const chunks: Buffer[] = []
+    for await (const chunk of audio) {
+      chunks.push(chunk)
+    }
     
-    // Return a mock audio buffer (empty for now)
-    return Buffer.from('mock-audio-data')
+    return Buffer.concat(chunks)
   } catch (error) {
     console.error('ElevenLabs speech generation error:', error)
     throw new Error('Failed to generate speech')
@@ -67,13 +80,8 @@ export async function generateSpeech(options: VoiceGenerationOptions): Promise<B
 
 export async function getAvailableVoices() {
   try {
-    // Mock implementation
-    return [
-      { voice_id: VOICE_IDS.ELDER_SUPPORT, name: 'Adam' },
-      { voice_id: VOICE_IDS.CUSTOMER_SUPPORT, name: 'Bella' },
-      { voice_id: VOICE_IDS.FRAUD_ALERT, name: 'Arnold' },
-      { voice_id: VOICE_IDS.NOTIFICATION, name: 'Bill' },
-    ]
+    const voices = await elevenlabs.voices.getAll()
+    return voices.voices
   } catch (error) {
     console.error('Error fetching voices:', error)
     throw new Error('Failed to fetch available voices')
