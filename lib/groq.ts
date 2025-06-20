@@ -1,7 +1,7 @@
-import OpenAI from 'openai'
+import Groq from 'groq-sdk'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY || '',
 })
 
 export interface ConversationContext {
@@ -68,7 +68,7 @@ export async function generateAIResponse(
   try {
     const systemPrompt = getSystemPrompt(context)
     
-    const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+    const messages: Groq.Chat.Completions.ChatCompletionMessageParam[] = [
       { role: 'system', content: systemPrompt },
       ...context.conversationHistory.map(msg => ({
         role: msg.role as 'system' | 'user' | 'assistant',
@@ -77,18 +77,18 @@ export async function generateAIResponse(
       { role: 'user', content: message },
     ]
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.1-70b-versatile',
       messages,
       max_tokens: 500,
       temperature: 0.7,
-      presence_penalty: 0.1,
-      frequency_penalty: 0.1,
+      top_p: 0.9,
+      stream: false,
     })
 
     return completion.choices[0]?.message?.content || 'I apologize, but I cannot process your request right now. Please try again or contact support.'
   } catch (error) {
-    console.error('OpenAI API error:', error)
+    console.error('Groq API error:', error)
     throw new Error('Failed to generate AI response')
   }
 }
@@ -111,8 +111,8 @@ function getSystemPrompt(context: ConversationContext): string {
 
 export async function detectIntent(message: string): Promise<ConversationContext['intent']> {
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
       messages: [
         {
           role: 'system',
@@ -127,6 +127,7 @@ export async function detectIntent(message: string): Promise<ConversationContext
       ],
       max_tokens: 10,
       temperature: 0.1,
+      stream: false,
     })
 
     const intent = completion.choices[0]?.message?.content?.trim().toLowerCase()

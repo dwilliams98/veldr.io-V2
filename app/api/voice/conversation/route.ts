@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateAIResponse, detectIntent, ConversationContext } from '@/lib/openai'
+import { generateAIResponse, detectIntent, ConversationContext } from '@/lib/groq'
 import { generateSpeech, VOICE_IDS, VOICE_SETTINGS } from '@/lib/elevenlabs'
 
 export async function POST(request: NextRequest) {
