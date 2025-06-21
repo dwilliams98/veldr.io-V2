@@ -12,25 +12,35 @@ export async function POST(request: NextRequest) {
       generateAudio = true 
     } = await request.json()
 
+    console.log('Conversation API called with:', { message, userType, generateAudio })
+
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 })
     }
 
     // Detect intent from the message
-    const intent = await detectIntent(message)
+    let intent: string
+    try {
+      intent = await detectIntent(message)
+      console.log('Detected intent:', intent)
+    } catch (error) {
+      console.error('Intent detection failed:', error)
+      intent = 'general_inquiry' // fallback
+    }
 
     // Build conversation context
     const context: ConversationContext = {
       userType,
       elderInfo,
       conversationHistory,
-      intent,
+      intent: intent as ConversationContext['intent'],
     }
 
     // Generate AI response
     let aiResponse: string
     try {
       aiResponse = await generateAIResponse(message, context)
+      console.log('Generated AI response:', aiResponse.substring(0, 100) + '...')
     } catch (error) {
       console.error('AI response generation failed:', error)
       // Provide a helpful fallback response
@@ -45,6 +55,8 @@ export async function POST(request: NextRequest) {
         if (!process.env.ELEVENLABS_API_KEY) {
           console.warn('ELEVENLABS_API_KEY is not configured - skipping audio generation')
         } else {
+          console.log('Generating audio for response...')
+          
           // Select appropriate voice based on context
           let voiceId = VOICE_IDS.CUSTOMER_SUPPORT
           let settings = VOICE_SETTINGS.CONVERSATIONAL
@@ -69,6 +81,8 @@ export async function POST(request: NextRequest) {
             audio: audioBuffer.toString('base64'),
             mimeType: 'audio/mpeg',
           }
+          
+          console.log('Audio generated successfully')
         }
       } catch (audioError) {
         console.error('Audio generation failed:', audioError)
@@ -91,13 +105,22 @@ export async function POST(request: NextRequest) {
       },
     ]
 
-    return NextResponse.json({
+    const response = {
       response: aiResponse,
       intent,
       audio: audioData,
       conversationHistory: updatedHistory,
       suggestions: generateSuggestions(intent, userType),
+    }
+
+    console.log('Sending response:', { 
+      responseLength: aiResponse.length, 
+      intent, 
+      hasAudio: !!audioData,
+      suggestionsCount: response.suggestions.length 
     })
+
+    return NextResponse.json(response)
   } catch (error) {
     console.error('Conversation API error:', error)
     

@@ -17,7 +17,8 @@ import {
   Phone,
   MessageCircle,
   Loader2,
-  WifiOff
+  WifiOff,
+  AlertCircle
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -55,33 +56,58 @@ export default function VoiceAssistant({
   const [audioEnabled, setAudioEnabled] = useState(true)
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null)
   const [connectionError, setConnectionError] = useState(false)
+  const [microphoneSupported, setMicrophoneSupported] = useState(false)
+  const [microphonePermission, setMicrophonePermission] = useState<'granted' | 'denied' | 'prompt' | 'unknown'>('unknown')
+  const [isClient, setIsClient] = useState(false)
 
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Initialize speech recognition
-    if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
-      const recognition = new (window as any).webkitSpeechRecognition()
-      recognition.continuous = false
-      recognition.interimResults = false
-      recognition.lang = 'en-US'
+    setIsClient(true)
+    
+    // Check for speech recognition support
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition
+      if (SpeechRecognition) {
+        setMicrophoneSupported(true)
+        
+        const recognition = new SpeechRecognition()
+        recognition.continuous = false
+        recognition.interimResults = false
+        recognition.lang = 'en-US'
 
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript
-        setInputText(transcript)
-        setIsListening(false)
+        recognition.onstart = () => {
+          console.log('Speech recognition started')
+          setIsListening(true)
+        }
+
+        recognition.onresult = (event: any) => {
+          console.log('Speech recognition result:', event.results)
+          const transcript = event.results[0][0].transcript
+          setInputText(transcript)
+          setIsListening(false)
+        }
+
+        recognition.onerror = (event: any) => {
+          console.error('Speech recognition error:', event.error)
+          setIsListening(false)
+          
+          if (event.error === 'not-allowed') {
+            setMicrophonePermission('denied')
+          }
+        }
+
+        recognition.onend = () => {
+          console.log('Speech recognition ended')
+          setIsListening(false)
+        }
+
+        recognitionRef.current = recognition
+      } else {
+        console.log('Speech recognition not supported')
+        setMicrophoneSupported(false)
       }
-
-      recognition.onerror = () => {
-        setIsListening(false)
-      }
-
-      recognition.onend = () => {
-        setIsListening(false)
-      }
-
-      recognitionRef.current = recognition
     }
 
     return () => {
@@ -95,17 +121,76 @@ export default function VoiceAssistant({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const startListening = () => {
+  // Check microphone permission
+  const checkMicrophonePermission = async () => {
+    if (!navigator.permissions) {
+      setMicrophonePermission('unknown')
+      return
+    }
+
+    try {
+      const permission = await navigator.permissions.query({ name: 'microphone' as PermissionName })
+      setMicrophonePermission(permission.state as any)
+      
+      permission.onchange = () => {
+        setMicrophonePermission(permission.state as any)
+      }
+    } catch (error) {
+      console.error('Error checking microphone permission:', error)
+      setMicrophonePermission('unknown')
+    }
+  }
+
+  useEffect(() => {
+    if (isClient) {
+      checkMicrophonePermission()
+    }
+  }, [isClient])
+
+  const requestMicrophonePermission = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      stream.getTracks().forEach(track => track.stop()) // Stop the stream immediately
+      setMicrophonePermission('granted')
+      return true
+    } catch (error) {
+      console.error('Microphone permission denied:', error)
+      setMicrophonePermission('denied')
+      return false
+    }
+  }
+
+  const startListening = async () => {
+    if (!microphoneSupported) {
+      alert('Speech recognition is not supported in your browser. Please try Chrome, Edge, or Safari.')
+      return
+    }
+
+    if (microphonePermission === 'denied') {
+      alert('Microphone access is denied. Please enable microphone permissions in your browser settings.')
+      return
+    }
+
+    if (microphonePermission !== 'granted') {
+      const granted = await requestMicrophonePermission()
+      if (!granted) return
+    }
+
     if (recognitionRef.current && !isListening) {
-      setIsListening(true)
-      recognitionRef.current.start()
+      try {
+        console.log('Starting speech recognition...')
+        recognitionRef.current.start()
+      } catch (error) {
+        console.error('Error starting speech recognition:', error)
+        alert('Failed to start speech recognition. Please try again.')
+      }
     }
   }
 
   const stopListening = () => {
     if (recognitionRef.current && isListening) {
+      console.log('Stopping speech recognition...')
       recognitionRef.current.stop()
-      setIsListening(false)
     }
   }
 
@@ -153,6 +238,8 @@ export default function VoiceAssistant({
     setConnectionError(false)
 
     try {
+      console.log('Sending message to API:', userMessage.content)
+      
       const response = await fetch('/api/voice/conversation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -169,12 +256,16 @@ export default function VoiceAssistant({
         }),
       })
 
+      console.log('API response status:', response.status)
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+        console.error('API error:', errorData)
         throw new Error(errorData.error || `HTTP ${response.status}`)
       }
 
       const data = await response.json()
+      console.log('API response data:', data)
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -265,6 +356,23 @@ export default function VoiceAssistant({
     }
   }
 
+  const getMicrophoneButtonTitle = () => {
+    if (!microphoneSupported) {
+      return 'Speech recognition not supported in this browser'
+    }
+    if (microphonePermission === 'denied') {
+      return 'Microphone access denied. Please enable in browser settings.'
+    }
+    if (isListening) {
+      return 'Click to stop listening'
+    }
+    return 'Click to start voice input'
+  }
+
+  if (!isClient) {
+    return null
+  }
+
   return (
     <Card className={cn("flex flex-col h-[600px]", className)}>
       <CardHeader className="pb-3">
@@ -275,6 +383,9 @@ export default function VoiceAssistant({
             {connectionError && (
               <WifiOff className="h-4 w-4 text-orange-500" title="Connection issues detected" />
             )}
+            {!microphoneSupported && (
+              <AlertCircle className="h-4 w-4 text-yellow-500" title="Speech recognition not supported" />
+            )}
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -282,6 +393,7 @@ export default function VoiceAssistant({
               size="sm"
               onClick={() => setAudioEnabled(!audioEnabled)}
               className="h-8 w-8 p-0"
+              title={audioEnabled ? "Disable audio responses" : "Enable audio responses"}
             >
               {audioEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
             </Button>
@@ -293,6 +405,11 @@ export default function VoiceAssistant({
             : "Get support and assistance for protecting your loved ones."
           }
         </p>
+        {microphonePermission === 'denied' && (
+          <div className="text-xs text-orange-600 bg-orange-50 p-2 rounded">
+            Microphone access is disabled. Enable it in your browser settings to use voice input.
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="flex-1 flex flex-col space-y-4">
@@ -301,7 +418,19 @@ export default function VoiceAssistant({
           {messages.length === 0 && (
             <div className="text-center text-muted-foreground py-8">
               <Bot className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
-              <p>Start a conversation by typing or speaking your question.</p>
+              <p className="mb-2">Start a conversation by typing or speaking your question.</p>
+              {microphoneSupported ? (
+                <p className="text-xs">
+                  {microphonePermission === 'granted' 
+                    ? "Microphone is ready for voice input" 
+                    : "Click the microphone to enable voice input"
+                  }
+                </p>
+              ) : (
+                <p className="text-xs text-orange-600">
+                  Voice input not supported in this browser. Try Chrome, Edge, or Safari.
+                </p>
+              )}
             </div>
           )}
           
@@ -340,6 +469,7 @@ export default function VoiceAssistant({
                       size="sm"
                       onClick={() => playAudio(message.audioUrl!)}
                       className="h-6 w-6 p-0"
+                      title="Play audio response"
                     >
                       <Volume2 className="h-3 w-3" />
                     </Button>
@@ -395,9 +525,11 @@ export default function VoiceAssistant({
               onClick={isListening ? stopListening : startListening}
               className={cn(
                 "absolute right-2 top-2 h-8 w-8 p-0",
-                isListening && "text-red-500"
+                isListening && "text-red-500",
+                (!microphoneSupported || microphonePermission === 'denied') && "opacity-50 cursor-not-allowed"
               )}
-              disabled={isLoading || !recognitionRef.current}
+              disabled={isLoading || !microphoneSupported || microphonePermission === 'denied'}
+              title={getMicrophoneButtonTitle()}
             >
               {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
             </Button>
@@ -406,6 +538,7 @@ export default function VoiceAssistant({
             onClick={sendMessage}
             disabled={!inputText.trim() || isLoading}
             className="h-[60px] px-4"
+            title="Send message"
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
