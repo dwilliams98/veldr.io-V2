@@ -93,8 +93,40 @@ export default function VoiceAssistant({
           console.error('Speech recognition error:', event.error)
           setIsListening(false)
           
-          if (event.error === 'not-allowed') {
-            setMicrophonePermission('denied')
+          // Handle specific error types with user-friendly messages
+          let errorMessage = ''
+          
+          switch (event.error) {
+            case 'no-speech':
+              errorMessage = 'No speech was detected. Please speak clearly into your microphone and try again.'
+              break
+            case 'audio-capture':
+              errorMessage = 'Unable to access your microphone. Please check your microphone connection and permissions.'
+              break
+            case 'not-allowed':
+              setMicrophonePermission('denied')
+              errorMessage = 'Microphone access was denied. Please enable microphone permissions in your browser settings.'
+              break
+            case 'network':
+              errorMessage = 'Network error occurred during speech recognition. Please check your internet connection.'
+              break
+            case 'aborted':
+              // Don't show error for user-initiated stops
+              return
+            default:
+              errorMessage = `Speech recognition error: ${event.error}. Please try again.`
+          }
+          
+          // Add error message to chat
+          if (errorMessage) {
+            const speechErrorMessage: Message = {
+              id: Date.now().toString(),
+              role: 'assistant',
+              content: errorMessage,
+              timestamp: new Date().toISOString(),
+              isError: true,
+            }
+            setMessages(prev => [...prev, speechErrorMessage])
           }
         }
 
