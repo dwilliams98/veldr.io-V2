@@ -57,6 +57,12 @@ export async function generateSpeech(options: VoiceGenerationOptions): Promise<B
     model = 'eleven_turbo_v2'
   } = options
 
+  // Check if API key is configured
+  if (!process.env.ELEVENLABS_API_KEY) {
+    console.error('ELEVENLABS_API_KEY is not configured')
+    throw new Error('ElevenLabs API key not configured')
+  }
+
   try {
     const audio = await elevenlabs.generate({
       voice: voiceId,
@@ -74,11 +80,34 @@ export async function generateSpeech(options: VoiceGenerationOptions): Promise<B
     return Buffer.concat(chunks)
   } catch (error) {
     console.error('ElevenLabs speech generation error:', error)
+    
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes('401') || error.message.includes('authentication')) {
+        throw new Error('Invalid ElevenLabs API key')
+      }
+      if (error.message.includes('429') || error.message.includes('rate limit')) {
+        throw new Error('ElevenLabs rate limit exceeded')
+      }
+      if (error.message.includes('quota') || error.message.includes('credits')) {
+        throw new Error('ElevenLabs quota exceeded')
+      }
+      if (error.message.includes('network') || error.message.includes('connection')) {
+        throw new Error('Network error connecting to ElevenLabs')
+      }
+    }
+    
     throw new Error('Failed to generate speech')
   }
 }
 
 export async function getAvailableVoices() {
+  // Check if API key is configured
+  if (!process.env.ELEVENLABS_API_KEY) {
+    console.error('ELEVENLABS_API_KEY is not configured')
+    throw new Error('ElevenLabs API key not configured')
+  }
+
   try {
     const voices = await elevenlabs.voices.getAll()
     return voices.voices

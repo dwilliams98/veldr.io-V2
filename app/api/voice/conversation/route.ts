@@ -106,15 +106,18 @@ export async function POST(request: NextRequest) {
     let statusCode = 500
     
     if (error instanceof Error) {
-      if (error.message.includes('API key')) {
+      if (error.message.includes('API key') || error.message.includes('authentication')) {
         errorMessage = 'Service configuration error. Please contact support.'
         statusCode = 503
-      } else if (error.message.includes('rate limit')) {
+      } else if (error.message.includes('rate limit') || error.message.includes('429')) {
         errorMessage = 'Service temporarily busy. Please try again in a moment.'
         statusCode = 429
-      } else if (error.message.includes('network') || error.message.includes('connection')) {
+      } else if (error.message.includes('network') || error.message.includes('connection') || error.message.includes('socket hang up')) {
         errorMessage = 'Service temporarily unavailable. Please try again later.'
         statusCode = 503
+      } else if (error.message.includes('timeout')) {
+        errorMessage = 'Request timeout. Please try again.'
+        statusCode = 408
       }
     }
     

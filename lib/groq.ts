@@ -1,8 +1,17 @@
 import Groq from 'groq-sdk'
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY || '',
-})
+// Initialize Groq client with better error handling
+let groq: Groq | null = null
+
+try {
+  if (process.env.GROQ_API_KEY) {
+    groq = new Groq({
+      apiKey: process.env.GROQ_API_KEY,
+    })
+  }
+} catch (error) {
+  console.error('Failed to initialize Groq client:', error)
+}
 
 export interface ConversationContext {
   userType: 'elder' | 'caregiver' | 'support'
@@ -87,6 +96,12 @@ export async function generateAIResponse(
   message: string,
   context: ConversationContext
 ): Promise<string> {
+  // Check if Groq client is initialized
+  if (!groq) {
+    console.error('Groq client is not initialized - API key may be missing')
+    return getFallbackResponse(context, message) + "\n\nNote: AI services are currently unavailable due to configuration issues. Please contact support for assistance."
+  }
+
   // Check if API key is configured
   if (!process.env.GROQ_API_KEY) {
     console.error('GROQ_API_KEY is not configured')
@@ -120,7 +135,7 @@ export async function generateAIResponse(
     
     // Provide helpful error messages based on error type
     if (error instanceof Error) {
-      if (error.message.includes('401') || error.message.includes('authentication')) {
+      if (error.message.includes('401') || error.message.includes('authentication') || error.message.includes('API key')) {
         console.error('Authentication failed - check GROQ_API_KEY')
         return getFallbackResponse(context, message) + "\n\nNote: AI services are temporarily unavailable due to authentication issues."
       }
@@ -128,9 +143,13 @@ export async function generateAIResponse(
         console.error('Rate limit exceeded')
         return getFallbackResponse(context, message) + "\n\nNote: AI services are temporarily busy. Please try again in a moment."
       }
-      if (error.message.includes('Connection error') || error.message.includes('socket hang up')) {
+      if (error.message.includes('Connection error') || error.message.includes('socket hang up') || error.message.includes('network') || error.message.includes('ECONNRESET')) {
         console.error('Network connection failed')
         return getFallbackResponse(context, message) + "\n\nNote: AI services are temporarily unavailable due to network issues."
+      }
+      if (error.message.includes('timeout')) {
+        console.error('Request timeout')
+        return getFallbackResponse(context, message) + "\n\nNote: AI services are temporarily slow. Please try again."
       }
     }
     
@@ -156,9 +175,9 @@ function getSystemPrompt(context: ConversationContext): string {
 }
 
 export async function detectIntent(message: string): Promise<ConversationContext['intent']> {
-  // Check if API key is configured
-  if (!process.env.GROQ_API_KEY) {
-    console.error('GROQ_API_KEY is not configured for intent detection')
+  // Check if Groq client is initialized
+  if (!groq || !process.env.GROQ_API_KEY) {
+    console.error('Groq client not available for intent detection, using fallback')
     return detectIntentFallback(message)
   }
 
