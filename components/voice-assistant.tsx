@@ -283,10 +283,10 @@ export default function VoiceAssistant({
           message: userMessage.content,
           userType,
           elderInfo,
+          // Remove timestamp from conversation history to fix repetitive responses
           conversationHistory: messages.map(m => ({
             role: m.role,
             content: m.content,
-            timestamp: m.timestamp,
           })),
           generateAudio: audioEnabled,
         }),
