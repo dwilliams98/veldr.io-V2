@@ -14,7 +14,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Shield, Settings, LogOut, User, Menu, HelpCircle } from "lucide-react"
+import { Settings, LogOut, User, Menu, HelpCircle } from "lucide-react"
+import Image from "next/image"
 
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -62,16 +63,26 @@ export default function Navbar() {
     return (
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50 safe-top">
         <div className="container mx-auto px-3 mobile:px-4 py-3 mobile:py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center space-x-2">
-            <Shield className="h-6 w-6 mobile:h-8 mobile:w-8 text-primary" />
-            <span className="text-lg mobile:text-2xl font-bold text-primary">Veldr.io</span>
+          <Link href="/" className="flex items-center space-x-3">
+            <div className="relative w-8 h-8 mobile:w-10 mobile:h-10">
+              <Image
+                src="/V3-Aluma ai-05 copy.jpg"
+                alt="Veldr.io"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+            <span className="text-lg mobile:text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-800 bg-clip-text text-transparent">
+              VELDR.IO
+            </span>
           </Link>
           
           <div className="flex items-center space-x-2">
             <Button variant="ghost" size="sm">
               Login
             </Button>
-            <Button size="sm">
+            <Button size="sm" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
               Get Started
             </Button>
           </div>
@@ -83,9 +94,19 @@ export default function Navbar() {
   return (
     <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50 safe-top">
       <div className="container mx-auto px-3 mobile:px-4 py-3 mobile:py-4 flex justify-between items-center">
-        <Link href={isAuthenticated ? "/dashboard" : "/"} className="flex items-center space-x-2">
-          <Shield className="h-6 w-6 mobile:h-8 mobile:w-8 text-primary" />
-          <span className="text-lg mobile:text-2xl font-bold text-primary">Veldr.io</span>
+        <Link href={isAuthenticated ? "/dashboard" : "/"} className="flex items-center space-x-3">
+          <div className="relative w-8 h-8 mobile:w-10 mobile:h-10">
+            <Image
+              src="/V3-Aluma ai-05 copy.jpg"
+              alt="Veldr.io"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+          <span className="text-lg mobile:text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-800 bg-clip-text text-transparent">
+            VELDR.IO
+          </span>
         </Link>
 
         {isAuthenticated ? (
@@ -97,7 +118,7 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={`text-sm lg:text-base text-muted-foreground hover:text-foreground transition-colors ${
-                    pathname === link.href ? "text-primary font-medium" : ""
+                    pathname === link.href ? "text-purple-600 font-medium" : ""
                   }`}
                 >
                   {link.label}
@@ -117,9 +138,18 @@ export default function Navbar() {
                 <SheetContent side="right" className="w-[280px] sm:w-[350px]">
                   <div className="flex flex-col h-full">
                     <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center space-x-2">
-                        <Shield className="h-6 w-6 text-primary" />
-                        <span className="text-lg font-bold text-primary">Veldr.io</span>
+                      <div className="flex items-center space-x-3">
+                        <div className="relative w-8 h-8">
+                          <Image
+                            src="/V3-Aluma ai-05 copy.jpg"
+                            alt="Veldr.io"
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                        <span className="text-lg font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-800 bg-clip-text text-transparent">
+                          VELDR.IO
+                        </span>
                       </div>
                     </div>
                     
@@ -131,7 +161,7 @@ export default function Navbar() {
                           onClick={handleNavClick}
                           className={`flex items-center py-3 px-4 rounded-lg text-base transition-colors ${
                             pathname === link.href 
-                              ? "bg-primary text-primary-foreground font-medium" 
+                              ? "bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 font-medium" 
                               : "text-muted-foreground hover:text-foreground hover:bg-accent"
                           }`}
                         >
@@ -228,7 +258,7 @@ export default function Navbar() {
             <Button variant="ghost" size="sm" asChild>
               <Link href="/login">Login</Link>
             </Button>
-            <Button size="sm" asChild>
+            <Button size="sm" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700" asChild>
               <Link href="/register">Get Started</Link>
             </Button>
           </div>

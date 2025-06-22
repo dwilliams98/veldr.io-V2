@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Shield, Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff } from "lucide-react"
+import Image from "next/image"
 
 interface FormData {
   name: string
@@ -67,13 +68,23 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-purple-100 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md border-purple-200 shadow-xl">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <Shield className="h-12 w-12 text-primary" />
+            <div className="relative w-16 h-16">
+              <Image
+                src="/V3-Aluma ai-05 copy.jpg"
+                alt="Veldr.io"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
           </div>
-          <CardTitle className="text-2xl">Create Account</CardTitle>
+          <CardTitle className="text-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-purple-800 bg-clip-text text-transparent">
+            Create Account
+          </CardTitle>
           <CardDescription>Join Veldr.io to protect your loved ones</CardDescription>
         </CardHeader>
         <CardContent>
@@ -89,6 +100,7 @@ export default function RegisterPage() {
                 value={formData.name}
                 onChange={handleChange}
                 required
+                className="border-purple-200 focus:border-purple-400"
               />
             </div>
 
@@ -102,6 +114,7 @@ export default function RegisterPage() {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                className="border-purple-200 focus:border-purple-400"
               />
             </div>
 
@@ -116,6 +129,7 @@ export default function RegisterPage() {
                   value={formData.password}
                   onChange={handleChange}
                   required
+                  className="border-purple-200 focus:border-purple-400"
                 />
                 <Button
                   type="button"
@@ -139,17 +153,22 @@ export default function RegisterPage() {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
+                className="border-purple-200 focus:border-purple-400"
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700" 
+              disabled={isLoading}
+            >
               {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm">
             <span className="text-muted-foreground">Already have an account? </span>
-            <Link href="/login" className="text-primary hover:underline">
+            <Link href="/login" className="text-purple-600 hover:text-purple-700 hover:underline">
               Sign in
             </Link>
           </div>
