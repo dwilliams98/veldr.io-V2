@@ -1,4 +1,4 @@
 "use client"
 
-// Re-export the main component for backward compatibility
-export { default } from './voice-assistant'
+// Re-export the main component from the correct location
+export { default } from './voice-assistant/index'
