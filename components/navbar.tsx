@@ -79,11 +79,11 @@ export default function Navbar() {
           </Link>
           
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm">
-              Login
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/login">Login</Link>
             </Button>
-            <Button size="sm" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
-              Get Started
+            <Button size="sm" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700" asChild>
+              <Link href="/register">Get Started</Link>
             </Button>
           </div>
         </div>
