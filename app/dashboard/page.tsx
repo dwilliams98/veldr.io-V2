@@ -177,186 +177,161 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-8">
-        {/* Header with Welcome Message */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-          <div className="flex items-center gap-2">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Welcome back, {user?.name || "User"}</h1>
-              <p className="text-muted-foreground">Here's what's happening with your family's protection</p>
-            </div>
-            <VersionInfo />
+      <main className="container mx-auto px-4 py-6">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Welcome back, {user?.name || "User"}</h1>
+            <p className="text-muted-foreground text-sm">Here&apos;s what&apos;s happening with your family&apos;s protection</p>
           </div>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={handleRefresh} disabled={isRefreshing}>
-              <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
+              <RefreshCw className={`h-4 w-4 mr-1.5 ${isRefreshing ? "animate-spin" : ""}`} />
               Refresh
             </Button>
             <Link href="/alerts">
-              <Button variant="outline" className="relative">
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                View All Alerts
+              <Button variant="outline" size="sm" className="relative">
+                <AlertTriangle className="h-4 w-4 mr-1.5" />
+                Alerts
                 {totalAlerts > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
-                  >
+                  <Badge variant="destructive" className="ml-1.5 h-5 px-1.5 text-xs">
                     {totalAlerts}
                   </Badge>
                 )}
               </Button>
             </Link>
             <Link href="/elders/new">
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
+              <Button size="sm" className="btn-veldr-primary">
+                <Plus className="h-4 w-4 mr-1.5" />
                 Add Elder
               </Button>
             </Link>
           </div>
         </div>
 
-        {/* Quick Status Alert */}
+        {/* Critical Alert Banner */}
         {criticalAlerts > 0 && (
-          <Card className="mb-8 border-red-200 bg-red-50">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="h-6 w-6 text-red-600" />
-                <div>
-                  <h3 className="font-semibold text-red-900">
-                    {criticalAlerts} Critical Alert{criticalAlerts > 1 ? "s" : ""} Need{criticalAlerts === 1 ? "s" : ""}{" "}
-                    Attention
-                  </h3>
-                  <p className="text-red-700 text-sm">Immediate action may be required to protect your loved ones.</p>
-                </div>
-                <Link href="/alerts" className="ml-auto">
-                  <Button variant="destructive" size="sm">
-                    Review Now
-                  </Button>
-                </Link>
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <AlertCircle className="h-5 w-5 text-red-600" />
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-red-900">
+                  {criticalAlerts} critical alert{criticalAlerts > 1 ? "s" : ""} need{criticalAlerts === 1 ? "s" : ""} attention
+                </p>
+                <p className="text-sm text-red-700">Immediate action may be required to protect your loved ones.</p>
+              </div>
+              <Link href="/alerts" className="flex-shrink-0">
+                <Button variant="destructive" size="sm">
+                  Review
+                </Button>
+              </Link>
+            </div>
+          </div>
         )}
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card
-            className="relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => router.push("/elders")}
-          >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Protected Elders</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/elders")}>
+            <CardContent className="pt-4 pb-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground">Protected Elders</span>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </div>
               <div className="text-2xl font-bold">{elders.length}</div>
-              <p className="text-xs text-muted-foreground">Active monitoring</p>
-              <div className="absolute bottom-0 left-0 w-full h-1 bg-green-500"></div>
+              <p className="text-xs text-green-600">Active monitoring</p>
             </CardContent>
           </Card>
 
-          <Card
-            className="relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => router.push("/alerts")}
-          >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">New Alerts</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/alerts")}>
+            <CardContent className="pt-4 pb-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground">New Alerts</span>
+                <AlertTriangle className={`h-4 w-4 ${totalAlerts > 0 ? "text-red-500" : "text-muted-foreground"}`} />
+              </div>
               <div className="text-2xl font-bold">{totalAlerts}</div>
-              <p className="text-xs text-muted-foreground">Require attention</p>
-              <div
-                className={`absolute bottom-0 left-0 w-full h-1 ${totalAlerts > 0 ? "bg-red-500" : "bg-green-500"}`}
-              ></div>
+              <p className={`text-xs ${totalAlerts > 0 ? "text-red-600" : "text-green-600"}`}>
+                {totalAlerts > 0 ? "Require attention" : "All clear"}
+              </p>
             </CardContent>
           </Card>
 
-          <Card
-            className="relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => router.push("/monitoring")}
-          >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">System Health</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/monitoring")}>
+            <CardContent className="pt-4 pb-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground">System Health</span>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </div>
               <div className="text-2xl font-bold">{overallHealth}%</div>
-              <p className="text-xs text-muted-foreground">All systems operational</p>
-              <div className="absolute bottom-0 left-0 w-full h-1 bg-green-500"></div>
+              <p className="text-xs text-green-600">All systems operational</p>
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Protection Status</CardTitle>
-              <Shield className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
+          <Card>
+            <CardContent className="pt-4 pb-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground">Status</span>
+                <Shield className="h-4 w-4 text-green-500" />
+              </div>
               <div className="text-2xl font-bold text-green-600">Active</div>
               <p className="text-xs text-muted-foreground">24/7 monitoring</p>
-              <div className="absolute bottom-0 left-0 w-full h-1 bg-green-500"></div>
             </CardContent>
           </Card>
         </div>
 
         {/* Service Monitoring Overview */}
-        <Card className="mb-8">
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <Card className="mb-6">
+          <CardHeader className="pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <CardTitle className="flex items-center gap-2">
-                  Service Monitoring
-                  <Badge variant="outline" className="text-xs">
-                    {mockServices.filter((s) => s.status === "Active").length} of {mockServices.length} active
-                  </Badge>
-                </CardTitle>
-                <CardDescription>Connected protection services across all platforms</CardDescription>
+                <CardTitle className="text-lg">Service Monitoring</CardTitle>
+                <CardDescription className="text-sm">
+                  {mockServices.filter((s) => s.status === "Active").length} of {mockServices.length} services active
+                </CardDescription>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={() => router.push("/monitoring/connect")}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Connect Service
+                  <Plus className="h-4 w-4 mr-1.5" />
+                  Connect
                 </Button>
                 <Link href="/monitoring">
                   <Button variant="outline" size="sm">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Manage Services
+                    <Settings className="h-4 w-4 mr-1.5" />
+                    Manage
                   </Button>
                 </Link>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {mockServices.map((service, index) => (
                 <div
                   key={`service-${index}`}
-                  className="text-center p-4 border rounded-lg hover:shadow-sm transition-shadow cursor-pointer"
+                  className="p-3 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
                   onClick={() => router.push("/monitoring")}
                 >
-                  <service.icon className={`h-8 w-8 mx-auto mb-2 ${service.color}`} />
-                  <h3 className="font-medium text-sm mb-1">{service.name}</h3>
-                  <div className="flex items-center justify-center gap-1 mb-2">
-                    <div
-                      className={`w-2 h-2 rounded-full ${service.status === "Active" ? "bg-green-500" : "bg-gray-400"}`}
-                    ></div>
-                    <p
-                      className={`text-xs ${service.status === "Active" ? "text-green-600" : "text-muted-foreground"}`}
-                    >
-                      {service.status}
-                    </p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <service.icon className={`h-5 w-5 ${service.color}`} />
+                    <span className={`w-2 h-2 rounded-full ${service.status === "Active" ? "bg-green-500" : "bg-gray-300"}`} />
                   </div>
+                  <h3 className="font-medium text-sm truncate">{service.name}</h3>
                   {service.status === "Active" && (
-                    <div className="space-y-1">
-                      <div className="text-xs text-muted-foreground">Health: {service.health}%</div>
+                    <div className="mt-2">
                       <Progress value={service.health} className="h-1" />
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="text-xs text-muted-foreground">{service.health}%</span>
+                        {service.alerts > 0 && (
+                          <Badge variant="destructive" className="h-5 px-1.5 text-xs">
+                            {service.alerts}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   )}
-                  {service.alerts > 0 && (
-                    <Badge variant="destructive" className="mt-2 text-xs">
-                      {service.alerts} alert{service.alerts > 1 ? "s" : ""}
-                    </Badge>
+                  {service.status !== "Active" && (
+                    <p className="text-xs text-muted-foreground mt-1">Not connected</p>
                   )}
                 </div>
               ))}
@@ -364,17 +339,17 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Elder Profiles */}
           <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Protected Elders</CardTitle>
-                  <CardDescription>Manage your loved ones&apos; protection settings</CardDescription>
+                  <CardTitle className="text-lg">Protected Elders</CardTitle>
+                  <CardDescription className="text-sm">Your loved ones&apos; protection status</CardDescription>
                 </div>
                 <Link href="/elders">
-                  <Button variant="outline" size="sm">
+                  <Button variant="ghost" size="sm">
                     View All
                   </Button>
                 </Link>

@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Settings, LogOut, User, Menu, Bell, HelpCircle, AlertTriangle, CheckCircle } from "lucide-react"
+import { Settings, LogOut, User, Menu, Bell, HelpCircle, AlertTriangle, CheckCircle, LayoutDashboard, Shield, Users, AlertCircle } from "lucide-react"
 import { useApp } from "@/contexts/app-context"
 import { APP_VERSION } from "@/config/version"
 import { VeldrLogo } from "@/components/veldr-logo"
@@ -28,7 +28,6 @@ export default function Navbar() {
   const pathname = usePathname()
 
   useEffect(() => {
-    // Check authentication status
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("veldr_token")
       setIsAuthenticated(!!token)
@@ -49,11 +48,11 @@ export default function Navbar() {
   }
 
   const handleProfileClick = () => {
-    console.log("Navigate to profile")
+    router.push("/profile")
   }
 
   const handleSettingsClick = () => {
-    console.log("Navigate to settings")
+    router.push("/settings")
   }
 
   const handleHelpClick = () => {
@@ -63,10 +62,10 @@ export default function Navbar() {
   const unreadCount = notifications.filter((n) => !n.read).length
 
   const navLinks = [
-    { href: "/dashboard", label: "Dashboard", description: "Overview and quick actions" },
-    { href: "/monitoring", label: "Monitoring", description: "Service connections and health" },
-    { href: "/elders", label: "Elders", description: "Manage protected family members" },
-    { href: "/alerts", label: "Alerts", description: "Security alerts and notifications" },
+    { href: "/dashboard", label: "Dashboard", description: "Overview and quick actions", icon: LayoutDashboard },
+    { href: "/monitoring", label: "Monitoring", description: "Service connections and health", icon: Shield },
+    { href: "/elders", label: "Elders", description: "Manage protected family members", icon: Users },
+    { href: "/alerts", label: "Alerts", description: "Security alerts and notifications", icon: AlertCircle },
   ]
 
   const getNotificationIcon = (type: string) => {
@@ -81,83 +80,83 @@ export default function Navbar() {
   }
 
   return (
-    <header className="border-b bg-card/95 backdrop-blur-sm sticky top-0 z-50 shadow-sm border-border/50">
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+    <header className="border-b bg-card sticky top-0 z-50 shadow-sm">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link
           href={isAuthenticated ? "/dashboard" : "/"}
-          className="flex items-center hover:opacity-80 transition-opacity"
+          className="flex items-center hover:opacity-90 transition-opacity"
         >
-          <VeldrLogo size="lg" variant="full" />
+          <VeldrLogo size="md" variant="full" />
         </Link>
 
         {isAuthenticated && (
           <>
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-accent/10 ${
-                    pathname === link.href
-                      ? "text-primary bg-primary/10 border border-primary/20 shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+            <nav className="hidden lg:flex items-center gap-1">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isActive
+                        ? "text-primary bg-primary/10"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                )
+              })}
             </nav>
 
             {/* Desktop Actions */}
-            <div className="hidden lg:flex items-center space-x-3">
+            <div className="hidden lg:flex items-center gap-2">
               {/* Notifications */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="relative hover:bg-accent/10">
+                  <Button variant="ghost" size="icon" className="relative h-9 w-9">
                     <Bell className="h-5 w-5" />
                     {unreadCount > 0 && (
-                      <Badge
-                        variant="destructive"
-                        className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs bg-primary text-white"
-                      >
-                        {unreadCount}
-                      </Badge>
+                      <span className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-red-500 text-white text-[10px] font-medium rounded-full flex items-center justify-center">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
                     )}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-80 veldr-card">
-                  <div className="flex items-center justify-between p-3 border-b border-border/50">
-                    <h3 className="font-semibold">Notifications</h3>
+                <DropdownMenuContent align="end" className="w-80">
+                  <div className="flex items-center justify-between px-3 py-2 border-b">
+                    <span className="font-semibold text-sm">Notifications</span>
                     {unreadCount > 0 && (
-                      <Button variant="ghost" size="sm" onClick={markAllNotificationsAsRead} className="text-xs">
+                      <Button variant="ghost" size="sm" onClick={markAllNotificationsAsRead} className="text-xs h-7 px-2">
                         Mark all read
                       </Button>
                     )}
                   </div>
-                  <div className="max-h-80 overflow-y-auto">
+                  <div className="max-h-72 overflow-y-auto">
                     {notifications.length === 0 ? (
-                      <div className="p-4 text-center text-muted-foreground">
-                        <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <div className="py-8 text-center text-muted-foreground">
+                        <Bell className="h-8 w-8 mx-auto mb-2 opacity-40" />
                         <p className="text-sm">No notifications</p>
                       </div>
                     ) : (
                       notifications.map((notification) => (
                         <div
                           key={notification.id}
-                          className={`p-3 border-b last:border-b-0 hover:bg-accent/5 cursor-pointer transition-colors ${
+                          className={`px-3 py-2.5 border-b last:border-b-0 hover:bg-muted/50 cursor-pointer transition-colors ${
                             !notification.read ? "bg-primary/5" : ""
                           }`}
                           onClick={() => markNotificationAsRead(notification.id)}
                         >
-                          <div className="flex items-start space-x-3">
+                          <div className="flex items-start gap-3">
                             {getNotificationIcon(notification.type)}
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-foreground">{notification.message}</p>
+                              <p className="text-sm text-foreground leading-snug">{notification.message}</p>
                               <p className="text-xs text-muted-foreground mt-1">{notification.time}</p>
                             </div>
                             {!notification.read && (
-                              <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></div>
+                              <span className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-1.5" />
                             )}
                           </div>
                         </div>
@@ -168,156 +167,131 @@ export default function Navbar() {
               </DropdownMenu>
 
               {/* Help */}
-              <Button variant="ghost" size="sm" onClick={handleHelpClick} className="hover:bg-accent/10">
+              <Button variant="ghost" size="icon" onClick={handleHelpClick} className="h-9 w-9">
                 <HelpCircle className="h-5 w-5" />
               </Button>
 
               {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-accent/10">
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={user?.avatar || "/placeholder.svg?height=32&width=32"} alt="User" />
-                      <AvatarFallback className="bg-primary/10 text-primary">
-                        {user?.name
-                          ?.split(" ")
-                          .map((n) => n[0])
-                          .join("") || "U"}
+                      <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                        {user?.name?.split(" ").map((n) => n[0]).join("") || "U"}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 veldr-card" align="end" forceMount>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
-                      <p className="text-xs leading-none text-muted-foreground">{user?.email || "user@example.com"}</p>
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm font-medium">{user?.name || "User"}</p>
+                      <p className="text-xs text-muted-foreground">{user?.email || "user@example.com"}</p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer" onClick={handleProfileClick}>
+                  <DropdownMenuItem onClick={handleProfileClick}>
                     <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
+                    Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer" onClick={handleSettingsClick}>
+                  <DropdownMenuItem onClick={handleSettingsClick}>
                     <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
+                    Settings
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer" onClick={handleHelpClick}>
+                  <DropdownMenuItem onClick={handleHelpClick}>
                     <HelpCircle className="mr-2 h-4 w-4" />
-                    <span>Help & Support</span>
+                    Help & Support
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 focus:text-red-600">
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 focus:bg-red-50">
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
+                    Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
 
             {/* Mobile Menu */}
-            <div className="lg:hidden flex items-center space-x-2">
+            <div className="lg:hidden flex items-center gap-1">
               {/* Mobile Notifications */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="relative">
-                    <Bell className="h-5 w-5" />
-                    {unreadCount > 0 && (
-                      <Badge
-                        variant="destructive"
-                        className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-xs bg-primary text-white"
-                      >
-                        {unreadCount}
-                      </Badge>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-72 veldr-card">
-                  <div className="flex items-center justify-between p-3 border-b">
-                    <h3 className="font-semibold text-sm">Notifications</h3>
-                    {unreadCount > 0 && (
-                      <Button variant="ghost" size="sm" onClick={markAllNotificationsAsRead} className="text-xs">
-                        Mark all read
-                      </Button>
-                    )}
-                  </div>
-                  <div className="max-h-60 overflow-y-auto">
-                    {notifications.slice(0, 3).map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`p-3 border-b last:border-b-0 ${!notification.read ? "bg-primary/5" : ""}`}
-                        onClick={() => markNotificationAsRead(notification.id)}
-                      >
-                        <div className="flex items-start space-x-2">
-                          {getNotificationIcon(notification.type)}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium text-foreground">{notification.message}</p>
-                            <p className="text-xs text-muted-foreground mt-1">{notification.time}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Button variant="ghost" size="icon" className="relative h-9 w-9" asChild>
+                <Link href="/alerts">
+                  <Bell className="h-5 w-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-red-500 text-white text-[10px] font-medium rounded-full flex items-center justify-center">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                </Link>
+              </Button>
 
               {/* Mobile Menu Sheet */}
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="icon" className="h-9 w-9">
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-80 veldr-card">
-                  <SheetHeader>
-                    <SheetTitle className="flex items-center space-x-2">
-                      <VeldrLogo size="md" variant="text" />
-                      <Badge variant="outline" className="ml-2 text-xs">
+                <SheetContent side="right" className="w-72 p-0">
+                  <SheetHeader className="p-4 border-b">
+                    <SheetTitle className="flex items-center gap-2">
+                      <VeldrLogo size="sm" variant="text" />
+                      <Badge variant="secondary" className="text-xs">
                         v{APP_VERSION}
                       </Badge>
                     </SheetTitle>
-                    <SheetDescription>Navigate your family protection dashboard</SheetDescription>
+                    <SheetDescription className="text-sm">Family protection dashboard</SheetDescription>
                   </SheetHeader>
 
-                  <div className="mt-6 space-y-1">
-                    {navLinks.map((link) => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        className={`block px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
-                          pathname === link.href
-                            ? "text-primary bg-primary/10 border border-primary/20"
-                            : "text-muted-foreground hover:text-foreground hover:bg-accent/10"
-                        }`}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <div>
-                          <div className="font-medium">{link.label}</div>
-                          <div className="text-xs text-muted-foreground mt-1">{link.description}</div>
-                        </div>
-                      </Link>
-                    ))}
+                  <div className="py-2">
+                    {navLinks.map((link) => {
+                      const Icon = link.icon
+                      const isActive = pathname === link.href
+                      return (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
+                            isActive
+                              ? "text-primary bg-primary/10 border-r-2 border-primary"
+                              : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                          }`}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          <Icon className="h-5 w-5" />
+                          <div>
+                            <div className="font-medium">{link.label}</div>
+                            <div className="text-xs text-muted-foreground">{link.description}</div>
+                          </div>
+                        </Link>
+                      )
+                    })}
                   </div>
 
-                  <div className="mt-8 pt-6 border-t space-y-1">
-                    <Button variant="ghost" className="w-full justify-start" size="sm" onClick={handleProfileClick}>
-                      <User className="mr-2 h-4 w-4" />
-                      Profile Settings
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start" size="sm" onClick={handleHelpClick}>
-                      <HelpCircle className="mr-2 h-4 w-4" />
+                  <div className="border-t py-2">
+                    <button onClick={handleProfileClick} className="flex items-center gap-3 px-4 py-3 w-full text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                      <User className="h-5 w-5" />
+                      Profile
+                    </button>
+                    <button onClick={handleSettingsClick} className="flex items-center gap-3 px-4 py-3 w-full text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                      <Settings className="h-5 w-5" />
+                      Settings
+                    </button>
+                    <button onClick={handleHelpClick} className="flex items-center gap-3 px-4 py-3 w-full text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                      <HelpCircle className="h-5 w-5" />
                       Help & Support
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start text-red-600 hover:text-red-600 hover:bg-red-50"
-                      size="sm"
+                    </button>
+                  </div>
+
+                  <div className="border-t py-2">
+                    <button
                       onClick={handleLogout}
+                      className="flex items-center gap-3 px-4 py-3 w-full text-sm text-red-600 hover:bg-red-50 transition-colors"
                     >
-                      <LogOut className="mr-2 h-4 w-4" />
+                      <LogOut className="h-5 w-5" />
                       Log out
-                    </Button>
+                    </button>
                   </div>
                 </SheetContent>
               </Sheet>

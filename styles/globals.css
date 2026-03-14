@@ -6,6 +6,8 @@
 
 body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1,
@@ -18,6 +20,7 @@ h6,
 .font-semibold {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
   font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 @layer utilities {
@@ -28,55 +31,54 @@ h6,
 
 @layer base {
   :root {
-    /* Veldr.io Brand Colors */
-    --background: 248 250 252; /* Light gray-blue for main background */
-    --foreground: 15 23 42; /* Dark navy for text */
-    --card: 255 255 255; /* Pure white for cards */
-    --card-foreground: 15 23 42; /* Dark navy for card text */
+    /* Veldr.io Brand Colors - Refined palette */
+    --background: 250 251 252;
+    --foreground: 15 23 42;
+    --card: 255 255 255;
+    --card-foreground: 15 23 42;
     --popover: 255 255 255;
     --popover-foreground: 15 23 42;
-    --primary: 0 212 255; /* Veldr cyan */
-    --primary-foreground: 255 255 255; /* White text on cyan */
-    --secondary: 30 41 59; /* Dark navy secondary */
-    --secondary-foreground: 248 250 252; /* Light text on dark */
-    --muted: 241 245 249; /* Very light gray-blue */
-    --muted-foreground: 100 116 139; /* Medium gray for muted text */
-    --accent: 0 212 255; /* Veldr cyan for accents */
+    --primary: 0 180 216;
+    --primary-foreground: 255 255 255;
+    --secondary: 30 41 59;
+    --secondary-foreground: 248 250 252;
+    --muted: 241 245 249;
+    --muted-foreground: 100 116 139;
+    --accent: 0 180 216;
     --accent-foreground: 255 255 255;
-    --destructive: 239 68 68; /* Red for destructive actions */
+    --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
-    --border: 226 232 240; /* Light border */
-    --input: 226 232 240; /* Light input border */
-    --ring: 0 212 255; /* Veldr cyan for focus rings */
-    --chart-1: 0 212 255;
+    --border: 226 232 240;
+    --input: 226 232 240;
+    --ring: 0 180 216;
+    --chart-1: 0 180 216;
     --chart-2: 34 197 94;
     --chart-3: 168 85 247;
     --chart-4: 251 191 36;
     --chart-5: 239 68 68;
-    --radius: 0.75rem; /* Slightly more rounded for modern look */
+    --radius: 0.5rem;
 
-    /* Sidebar colors matching main theme */
+    /* Sidebar */
     --sidebar-background: 255 255 255;
     --sidebar-foreground: 15 23 42;
-    --sidebar-primary: 0 212 255;
+    --sidebar-primary: 0 180 216;
     --sidebar-primary-foreground: 255 255 255;
     --sidebar-accent: 241 245 249;
     --sidebar-accent-foreground: 15 23 42;
     --sidebar-border: 226 232 240;
-    --sidebar-ring: 0 212 255;
+    --sidebar-ring: 0 180 216;
   }
 
   .dark {
-    /* Dark mode with Veldr navy as primary background */
-    --background: 15 23 42; /* Veldr navy */
-    --foreground: 248 250 252; /* Light text */
-    --card: 30 41 59; /* Slightly lighter navy for cards */
+    --background: 15 23 42;
+    --foreground: 248 250 252;
+    --card: 30 41 59;
     --card-foreground: 248 250 252;
     --popover: 30 41 59;
     --popover-foreground: 248 250 252;
-    --primary: 0 212 255; /* Keep Veldr cyan */
-    --primary-foreground: 15 23 42; /* Dark text on cyan */
-    --secondary: 51 65 85; /* Medium navy */
+    --primary: 0 212 255;
+    --primary-foreground: 15 23 42;
+    --secondary: 51 65 85;
     --secondary-foreground: 248 250 252;
     --muted: 51 65 85;
     --muted-foreground: 148 163 184;
@@ -108,9 +110,9 @@ h6,
   }
 }
 
-/* Custom Veldr.io specific styles */
+/* Veldr.io Brand Styles */
 .veldr-gradient {
-  background: linear-gradient(135deg, #00d4ff 0%, #0ea5e9 100%);
+  background: linear-gradient(135deg, #00b4d8 0%, #0096c7 100%);
 }
 
 .veldr-navy {
@@ -118,30 +120,125 @@ h6,
 }
 
 .veldr-cyan {
-  color: #00d4ff;
+  color: #00b4d8;
 }
 
 .veldr-logo-glow {
-  filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.3));
+  filter: drop-shadow(0 0 12px rgba(0, 180, 216, 0.25));
 }
 
-/* Enhanced button styles */
+/* Button Styles */
 .btn-veldr-primary {
-  @apply bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200;
-  background: linear-gradient(135deg, #00d4ff 0%, #0ea5e9 100%);
+  @apply bg-primary text-primary-foreground font-medium shadow-sm;
+  @apply hover:bg-primary/90 hover:shadow-md;
+  @apply active:scale-[0.98];
+  @apply transition-all duration-150 ease-out;
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
 }
 
 .btn-veldr-secondary {
-  @apply bg-secondary text-secondary-foreground hover:bg-secondary/90 border border-primary/20;
+  @apply bg-secondary text-secondary-foreground font-medium;
+  @apply hover:bg-secondary/90;
+  @apply transition-all duration-150;
 }
 
-/* Card enhancements */
+/* Card Styles */
 .veldr-card {
-  @apply bg-card border border-border/50 shadow-sm hover:shadow-md transition-all duration-200;
-  backdrop-filter: blur(10px);
+  @apply bg-card border border-border rounded-lg shadow-sm;
+  @apply transition-shadow duration-200;
+}
+
+.veldr-card:hover {
+  @apply shadow-md;
 }
 
 .veldr-card-premium {
-  @apply veldr-card border-primary/20 shadow-primary/5;
-  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
+  @apply veldr-card border-primary/10;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 180, 216, 0.08);
+}
+
+/* Status Indicators */
+.status-dot {
+  @apply w-2 h-2 rounded-full;
+}
+
+.status-dot-active {
+  @apply bg-green-500;
+  animation: pulse-green 2s ease-in-out infinite;
+}
+
+.status-dot-warning {
+  @apply bg-amber-500;
+}
+
+.status-dot-error {
+  @apply bg-red-500;
+}
+
+.status-dot-inactive {
+  @apply bg-gray-400;
+}
+
+@keyframes pulse-green {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Page Header */
+.page-header {
+  @apply mb-8;
+}
+
+.page-header h1 {
+  @apply text-2xl sm:text-3xl font-bold text-foreground tracking-tight;
+}
+
+.page-header p {
+  @apply text-muted-foreground mt-1;
+}
+
+/* Consistent Spacing */
+.section-spacing {
+  @apply py-8 sm:py-12;
+}
+
+.card-grid {
+  @apply grid gap-4 sm:gap-6;
+}
+
+/* Focus States */
+.focus-ring {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-muted/50 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/20 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/30;
+}
+
+/* Loading Skeleton */
+.skeleton {
+  @apply bg-muted animate-pulse rounded;
+}
+
+/* Responsive Container */
+.container-narrow {
+  @apply max-w-4xl mx-auto px-4 sm:px-6;
+}
+
+.container-wide {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
