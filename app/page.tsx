@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Phone, Users, AlertTriangle, CheckCircle, ArrowRight, Shield, Mail, CreditCard } from "lucide-react"
 import { APP_VERSION } from "@/config/version"
 import { VeldrLogo } from "@/components/veldr-logo"
+import ScamChecker from "@/components/scam-checker"
 
 export default function LandingPage() {
   return (
@@ -181,6 +182,23 @@ export default function LandingPage() {
             </CardContent>
           </Card>
         </div>
+      </section>
+
+      {/* Scam Checker */}
+      <section className="container mx-auto px-4 py-12 lg:py-16">
+        <div className="text-center mb-8">
+          <Badge variant="secondary" className="mb-3 px-3 py-1 text-xs">
+            Try it free — no account needed
+          </Badge>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 tracking-tight">
+            Not sure if a message is a scam?
+          </h2>
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            Paste or upload any suspicious message and our AI will instantly analyse it for
+            common fraud patterns.
+          </p>
+        </div>
+        <ScamChecker />
       </section>
 
       {/* CTA Section */}
